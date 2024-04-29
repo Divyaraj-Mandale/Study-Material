@@ -1,0 +1,20 @@
+ cat Install_java_Centos.yml
+---
+  - name: Installing java
+    yum:
+      name: openjdk-8-jdk
+      state: present
+[root@master include]# cat install_webserver_Centos.yml
+---
+- name: Install webserver
+  yum:
+   name: httpd
+   state: present
+[root@master include]# cat install_multiple_pkg.yml
+---
+  - name: Simple play to Install multiple package
+    hosts: web
+    gather_facts: true
+    tasks:
+      - include_tasks: install_webserver_Centos.yml
+      - include_tasks: Install_java_Centos.yml

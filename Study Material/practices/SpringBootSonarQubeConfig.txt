@@ -1,0 +1,163 @@
+1.Launch Ec2 and install below software
+
+Install Java
+
+sudo apt-get update
+sudo apt install openjdk-17-jre-headless -y
+java --version
+
+Install maven
+
+sudo apt update
+sudo apt-get install maven -y
+mvn --version
+
+
+----------------------------------------------------------------------------------------------
+
+2.connect runner
+
+goto :- Peoject > settings > CICD > runner >
+
+  install runner before that check the Architecture
+  command - dpkg --print-architecture 
+  and select ruuner according to architecture
+  go to ruuner copy command and paste into ec2 for connection
+  give the proper information like
+                                                   
+Enter the GitLab instance URL (for example, https://gitlab.com/):[https://gitlab.com/]:- hit enter
+Enter the registration token:[GR1348941bkm4m-mAhWAUZRfjzuJu]:- hit enter
+Enter a description for the runner:[ip-172-31-35-203]:- hit enter
+Enter tags for the runner (comma-separated):- give any tag name remember we have to give that name inside yml file (ec2,server)
+Enter optional maintenance note for the runner:- hit enter
+Enter an executor: docker+machine, kubernetes, instance, custom, shell, parallels, virtualbox, ssh, docker, docker-windows, docker-autoscaler:- shell
+
+
+goto runner >  click on edit option > and check run without tag --if you want to run withut tag
+
+----------------------------------------------------------------------------------------------
+
+3.Shell profile loading - move to root before doing that operation - sudo su
+
+To troubleshoot this error, check 
+command - compulsory do sudo su before running this command
+vi /home/gitlab-runner/.bash_logout
+For example, if the .bash_logout file has a script section like the following, 
+comment it out and restart the pipeline:
+
+before :-
+
+if [ "$SHLVL" = 1 ]; then
+    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+fi
+
+after :-
+
+#if [ "$SHLVL" = 1 ]; then
+#  		[ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#fi
+
+
+----------------------------------------------------------------------------------------------
+2. install sonarqube/sonarqube-9
+
+cd /opt  
+sudo apt update
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.4.87374.zip
+ls
+sudo apt install unzip
+sudo unzip sonarqube-9.9.4.87374.zip 
+ls
+ll
+cd sonarqube-9.9.4.87374
+ls
+--------just check the sonar file-----
+cd conf/
+ls
+cat sonar.properties 
+cd ..
+ls
+cd bin/
+ls
+cd linux-x86-64/
+ls
+
+---------------------------------------------------------------------------------------------
+
+ubuntu@ip-172-31-88-121:/opt/sonarqube-9.9.4.87374/bin$ cd ..
+ubuntu@ip-172-31-88-121:/opt/sonarqube-9.9.4.87374$ 
+--create user to run sonar---
+sudo useradd sonaradmin
+sudo chown -R sonaradmin:sonaradmin /opt/sonarqube-9.9.4.87374
+ll
+su - sonaradmin
+$ 
+$ cd /opt
+$ ls
+sonarqube-9.9.4.87374  sonarqube-9.9.4.87374.zip
+$ cd sonarqube-9.9.4.87374                                             
+$ ls
+COPYING  bin  conf  data  dependency-license.json  elasticsearch  extensions  lib  logs  temp  web
+$ cd bin
+$ ls 
+linux-x86-64  macosx-universal-64  windows-x86-64  winsw-license
+$ cd linux-x86-64
+$ ls
+sonar.sh
+./sonar.sh start
+./sonar.sh status
+exit
+----Not sonar is running----
+goto security group and enable the port 9000 inbound
+---run sonar qube
+publicport:9000
+---------------------------------
+bydefault password is admin admin
+reset the password
+successfully login into sonar qube
+
+-------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+
+set variable in gitlab
+
+SONAR_USERNAME -  user name
+SONAR_PASSWORD - sonar password
+SONAR_URL - http://54.152.100.135:9000/
+
+give above name as it is default name
+
+-------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+
+write the .gitlab-ci.yaml
+
+
+stages:
+  - build
+  - deploy_sonar
+
+build:
+    stage: build
+    image:  maven:3.8.3-openjdk-17
+    script:
+        - echo "Building app..."
+        - mvn install
+        - echo "Finished building the app."
+    artifacts:
+        expire_in: 1 week
+        paths:
+            - target/dockerdemo.jar
+    tags:
+        - ec2
+        - server
+
+
+deploy_Sonar:
+    stage: deploy_sonar
+    image: maven:latest
+    script:
+        - mvn --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD
+    tags:
+        - ec2
+        - server

@@ -1,0 +1,101 @@
+---Clone the code--------------------------------------------------------------
+
+git clone https://gitlab.com/sachin-borde/springboothelloworld.git
+
+---java install--------------------------------------------------------------
+
+sudo apt-get update
+
+sudo apt install openjdk-17-jre-headless -y
+
+java --version
+
+sudo apt-get remove openjdk-17-jre-headless -y
+
+---maven install--------------------------------------------------------------
+
+sudo apt update
+
+sudo apt-get install maven -y
+
+mvn --version
+
+sudo apt-get remove maven -y
+
+---apache tomcat install--------------------------------------------------------------
+
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.86/bin/apache-tomcat-9.0.86.tar.gz
+
+sudo tar xzvf apache-tomcat-9.0.86.tar.gz
+
+sudo rm -r apache-tomcat-9.0.86.tar.gz
+
+---create jar file--------------------------------------------------------------
+
+sudo apt-get update
+
+sudo mvn clean install
+
+---run the jar file--------------------------------------------------------------
+
+java -jar SpringBootHelloWorld-3.2.3.jar
+
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+___________________________________________________________________________________________________________
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+FROM openjdk:17-alpine
+EXPOSE 8080
+ADD target/SpringBootHelloWorld-3.2.3.jar helloworld
+ENTRYPOINT ["java", "-jar","helloworld"]
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+___________________________________________________________________________________________________________
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+# install docker and pull image and run image
+
+sudo apt-get update
+sudo apt-get remove docker docker-engine docker.io
+sudo apt-get update
+sudo apt install docker.io -y
+sudo snap install docker
+sudo docker --version
+sudo apt-get update
+sudo docker pull sachinborde/helloworld:latest
+sudo docker run -p 8080:8080 sachinborde/helloworld
+sudo docker run -p 8080:8080 -d sachinborde/helloworld
+
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+___________________________________________________________________________________________________________
+&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+# install java maven docker and pull image and run image
+
+sudo apt-get update
+git clone https://gitlab.com/sachin-borde/springboothelloworld.git
+sudo apt-get update
+sudo apt install openjdk-17-jre-headless -y
+sudo apt update
+sudo apt-get install maven -y
+sudo apt-get update
+cd springboothelloworld/
+sudo mvn clean install
+cd ..
+sudo apt-get update
+sudo apt-get remove docker docker-engine docker.io
+sudo apt-get update
+sudo apt install docker.io -y
+sudo snap install docker
+cd springboothelloworld/
+echo "FROM openjdk:17-alpine
+ADD target/SpringBootHelloWorld-3.2.3.jar helloworld
+ENTRYPOINT [\"java\", \"-jar\",\"helloworld\"]
+EXPOSE 8080" > Dockerfile
+sudo docker build -f Dockerfile -t helloworld .
+sudo docker tag helloworld sachinborde/helloworld
+sudo docker login --username sachinborde --password Sachin@899
+sudo docker push sachinborde/helloworld
+sudo docker pull sachinborde/helloworld:latest
+sudo docker run -p 8080:8080 sachinborde/helloworld

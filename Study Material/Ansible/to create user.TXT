@@ -1,0 +1,20 @@
+# vi user-add.sh
+
+#!/bin/sh
+for user in `more user-list1.txt`
+do
+echo "$user"
+useradd $user
+echo "$user@123" | passwd --stdin "$user"
+chage -d 0 $user
+done# 
+
+
+
+
+
+
+                                                                                # cat user-list1.txt  [create one file of name user-list1.txt]
+                                                                                 user1
+                                                                                 user2
+                                                                                 user3                    [dont use #!/bin/bash in this file]

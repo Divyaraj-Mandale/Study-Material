@@ -1,0 +1,80 @@
+mounting:-
+*********
+connecting block device with a directory to store data in a disk.
+
+--> types of mounting:-
+**********************
+1)temporary mounting:-
+*********************
+--> temeprory mounting is for mean while and it will removed after a successfull reboot.
+
+#mount <device name>  <mount point>  --> to mount a device to perticular mount point.
+ex: #mount /dev/sdb1  /mnt/d1
+
+    #cd /mnt/d1
+
+unmounting:-
+***********
+removing the connection between block device & directory.
+--> the data is no longer existing in mount point.
+--> the data is send to block device.
+--> again if you mount with some other dir you get back the same data.
+
+#umount <device name> --> unmounting using a device name.
+ex:#umount /dev/sdb1
+
+      (or)
+
+#umount <mount point>  --> unmounting using a mount point.
+ex:#umount /mnt/d1
+
+
+2)permanent mounting:-
+**********************
+--> this mounting will withstand reboot.
+--> this mounting is majorly used everywhere.
+--> you have to edit a confiduration file for permanent mounting.
+--> the config file is /etc/fstab
+--> after mention in /etc/fstab file it will not mount directly 
+--> you have to give #reboot (or) #mount -a
+
+#vim /etc/fstab
+
+press esc+shift+g  --> press  esc+shift+a --> press enter.
+
+<device name>	<mount point>	<filesystem>	<permissions>	<fs checkup>	<fs backup>
+
+/dev/sdb1	/mnt/d1		ext4		defaults	0 -> disable	0 -> disable
+								1 -> enable 	1 -> enable
+
+
+:wq!
+
+#lsblk --> permanent mounting will not be updated.
+
+#mount -a --> mount all entries in /etc/fstab.
+
+(or)
+
+#reboot
+
+
+removing permanent mounting:-
+****************************
+
+#umount <device name> (or) <mount point>  --> unmount the mounted disk.
+
+ex:#umount /dev/sdb1
+
+#vim /etc/fstab
+
+remove the entry which you added.
+
+:wq!
+
+
+note:-
+******
+dont remove the permanent mount of other devices of operating system.
+
+UUID (universal unique indentification) --> it is id assigned for block devices for kernel identification.

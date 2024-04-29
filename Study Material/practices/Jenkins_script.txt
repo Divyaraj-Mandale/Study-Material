@@ -1,0 +1,52 @@
+pipeline{
+    agent any
+    tools{
+        maven 'maven_3'
+    }
+    stages{
+        stage("git_pull"){
+            steps {
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Divyaraj-Mandale/Springboot_hello_world.git']])
+            
+            }
+        }
+        stage("build"){
+            steps {
+                sh 'mvn clean install package'
+            
+            }
+        }
+        stage("docker_image"){
+            steps {
+                
+                sh 'docker stop raj'
+                sh 'docker rm -f $(docker ps -aq)'
+                sh 'docker rmi rajmandale/springboot:hello'
+                sh 'cd /home/workspace/sachin'
+                
+                sh 'docker build . -t rajmandale/springboot:hello'
+                sh 'docker run -d -it --name raj -p 8090:8080 rajmandale/springboot:hello'
+            
+            }
+        }
+        stage("hub_login"){
+            steps {
+                withCredentials([string(credentialsId: 'HUB_PASS', variable: 'pass')]) {
+                sh 'docker login -u rajmandale -p $pass'
+                }
+            
+            }
+        }
+        stage("docker_push"){
+            steps {
+                sh 'docker push rajmandale/springboot:hello'
+            }
+        }
+        stage("k8s"){
+            steps {
+                sh 'cd /home/workspace/sachin'
+                sh 'kubectl apply -f nginx-deployment.yaml'
+            }
+        }
+    }
+}

@@ -1,0 +1,152 @@
+1. ec2 setup
+
+install below on ec2
+  
+ **java**
+  
+sudo apt-get update
+sudo apt install openjdk-17-jre-headless -y
+java --version
+
+sudo apt-get remove openjdk-17-jre-headless -y
+
+ **maven**
+ 
+sudo apt update
+sudo apt-get install maven -y
+mvn --version
+
+sudo apt-get remove maven -y
+ 
+ **docker**
+
+sudo apt-get update
+sudo apt install docker.io -y
+sudo docker --version
+
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo systemctl status docker
+
+sudo apt-get remove docker docker-engine docker.io
+
+give the permission to docker.sock to perform the operation on docker
+
+command - 
+
+chmod 777 /var/run/docker.sock
+
+after stop and start server again give the permission
+
+ **AWS cli**
+ 
+ sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+ 
+ sudo apt install unzip
+ 
+ sudo unzip awscliv2.zip
+ 
+ sudo ./aws/install
+ 
+ aws --version
+ 
+----------------------------------------------------------------------------------------------------------
+
+2.connect runner
+
+goto :- Peoject > settings > CICD > runner >
+
+  install runner before that check the Architecture
+  command - dpkg --print-architecture 
+  and select ruuner according to architecture
+  go to ruuner copy command and paste into ec2 for connection
+  give the proper information like
+                                                   
+Enter the GitLab instance URL (for example, https://gitlab.com/):[https://gitlab.com/]:- hit enter
+Enter the registration token:[GR1348941bkm4m-mAhWAUZRfjzuJu]:- hit enter
+Enter a description for the runner:[ip-172-31-35-203]:- hit enter
+Enter tags for the runner (comma-separated):- give any tag name remember we have to give that name inside yml file (ec2,server)
+Enter optional maintenance note for the runner:- hit enter
+Enter an executor: docker+machine, kubernetes, instance, custom, shell, parallels, virtualbox, ssh, docker, docker-windows, docker-autoscaler:- shell
+
+
+goto runner >  click on edit option > and check run without tag --if you want to run withut tag
+
+----------------------------------------------------------------------------------------------------------
+
+3.Shell profile loading - move to root before doing that operation - sudo su
+
+To troubleshoot this error, check 
+command - vi /home/gitlab-runner/.bash_logout
+For example, if the .bash_logout file has a script section like the following, 
+comment it out and restart the pipeline:
+
+before :-
+
+if [ "$SHLVL" = 1 ]; then
+    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+fi
+
+after :-
+
+#if [ "$SHLVL" = 1 ]; then
+#  		[ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#fi
+
+----------------------------------------------------------------------------------------------------------
+
+step 4-
+
+goto aws and search s3 and create bucket
+
+goto aws create IAM user give policy (AmazonS3FullAccess) add given policy
+
+create secret key and add in variable 
+
+AWS_ACCESS_KEY_ID  -- key generated from iam user
+AWS_DEFAULT_REGION -- region of your aws
+AWS_SECRET_ACCESS_KEY -- password generated from iam user
+S3_BUCKET -- your s3 bucket name
+
+give above name as it is default name
+
+----------------------------------------------------------------------------------------------------------
+
+step 5-
+
+create .gitlab-ci.yaml
+
+{
+stages:
+  - build
+  - deploy_s3
+
+build:
+    stage: build
+    image:  maven:3.8.3-openjdk-17
+    script:
+        - echo "Building app..."
+        - mvn install
+        - echo "Finished building the app."
+    artifacts:
+        expire_in: 1 week
+        paths:
+            - target/helloworld.jar
+    tags:
+        - ec2
+        - server
+
+
+deploy_S3:
+    stage: deploy_s3
+    image:
+        name: banst/awscli
+        entrypoint: [""]
+    script:
+        - aws configure set region us-east-2
+        - aws s3 cp /home/gitlab-runner/builds/U5An6hwA/0/raj-mandale/SpringBootS3Bucket/target/helloworld.jar s3://$S3_BUCKET
+    tags:
+        - ec2
+        - server
+
+}

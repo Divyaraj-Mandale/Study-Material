@@ -1,0 +1,32 @@
+[root@ip-172-31-29-39 practice]# cat first.sh 
+#!/bin/bash
+
+echo "what is your name?"
+read name
+echo "hello $name"
+
+echo "what is yuor age?"
+read age
+
+echo "$name your age is $age"
+
+
+echo  "hello"
+*****************************************************
+[root@ip-172-31-29-39 practice]# cat second.sh 
+#!/bin/bash
+echo Enter the number you want to get factorial for
+read num
+for ((i=1;i<=num;i++))
+do
+
+        for ((j=num;j>=i;j--))
+        do
+                echo -n " "
+        done
+        for ((k=1;k<=i;k++))
+        do
+                echo -n "*"
+        done
+echo  ""
+done

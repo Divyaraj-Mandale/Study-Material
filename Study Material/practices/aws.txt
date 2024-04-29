@@ -1,0 +1,196 @@
+DevOps
+
+23-29 terraform     done
+
+30-05 docker and git done
+
+06-12 jenkins, linux and networking  done 
+ 
+13-19 AWS -in progress
+
+20-26 ansible and kubernates 
+
+27-01 grafana  and prometheus
+
+Java 
+
+start with core java
+
+
+https://github.com/paramsd1997/dockerising_react_app.git
+
+
+
+###Dockerfile
+
+FROM openjdk:8-jdk-alpine
+MAINTAINER baeldung.com
+EXPOSE 8080
+COPY target/spring-boot-hello-world-example-0.0.1-SNAPSHOT.jar .
+ENTRYPOINT ["java","-jar","/spring-boot-hello-world-example-0.0.1-SNAPSHOT.jar"]
+
+FROM openjdk:8-jdk-alpine
+EXPOSE 8080
+COPY target/sachin.jar .
+ENTRYPOINT ["java","-jar","/sachin.jar"]
+
+sachin.jar
+
+###Install Maven with Yum on Amazon Linux
+
+sudo yum install java-17-amazon-corretto-devel -y
+
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+sudo yum install -y apache-maven
+mvn --version
+
+
+https://gitlab.com/sachin-borde/springboothelloworld/-/blob/main/src/main/java/com/javatpoint/controller/HelloWorldController.java?ref_type=heads
+
+
+       docker build . -t sachin:s1
+   37  docker images
+   38  docekr run -d -it --name raj -p 8080:8080 sachin:s1
+	docker ps
+	docker exec -it raj /bin/sh
+
+*********************************************************
+sudo umount -l /tmp
+sudo mount -t tmpfs -o size=1G,mode=1777 overflow /tmp
+
+https://www.youtube.com/watch?v=Se7JtzFVZGE
+
+#docker stop raj
+#docker rm raj
+#docker rmi rajmandale/springboot:hello
+docker build . -t sachin
+docker run -d -it --name raj -p 8090:8080 sachi
+
+https://www.youtube.com/watch?v=aVPPTEH0dYo
+
+ us-east1
+How to do jenkin and slave setup
+https://www.youtube.com/watch?v=Se7JtzFVZGE
+
+[root@ip-172-31-46-29 springboothelloworld]# history
+    1  cd
+    2  yum update -y
+    3  yum install git -y
+    4  git -version
+    5  git --version
+    6  mkdir demo
+    7  ls
+    8  cd demo/
+    9  git clone https://gitlab.com/sachin-borde/springboothelloworld.git
+   10  ls
+   11  sudo yum install java-17-amazon-corretto-devel -y
+   12  java --version
+   13  sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+   14  sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+   15  sudo yum install -y apache-maven
+   16  mvn --version
+   17  mvn clean package
+   18  ls
+   19  cd springboothelloworld/
+   20  ls
+   21  mvn clean package
+   22  ls
+   23  vi Dockerfile
+   24  cat Dockerfile 
+   25  cd target/
+   26  ls
+   27  cd ..
+   28  ls
+   29  yum install docker*
+   30  systemctl start docker
+   31  systemctl enable docker
+   32  systemctl status docker
+   33  q
+   34  docker build . -t sachin:s1
+   35  docker images
+   36  docker run -d -it --name raj -p 8080:8080 sachin:s1
+   37  docker ps
+   38  docker exec -it raj bash
+   39  docker exec -it raj bash/sh
+   40  docker exec -it raj /bin/sh
+   41  ls
+   42  cd target/
+   43  ls
+   44  cd ..
+   45  ls
+   46  cat D
+   47  cat Dockerfile 
+   48  vi Dockerfile 
+   49  ls
+   50  cat Dockerfile 
+   51  java --version
+   52  mvn -version
+   53  history
+
+Generate SSH Key 
+       ssh-keygen
+   33  ls
+   34  cd ~/.ssh/
+   35  ls
+authorized_keys  id_rsa  id_rsa.pub
+   36  cat id_rsa
+   37  cat id_rsa.pub 
+   38  chmod 777 /home/
+   39  vi authorized_keys
+
+
+		sh 'docker stop raj'
+                sh 'docker rm -f $(docker ps -aq)'
+                sh 'docker rmi -f $(docker images)'
+
+**************************************************************************************
+---install java
+
+sudo apt update -y
+sudo apt install openjdk-17-jre -y
+java --version
+
+
+---install jenkins
+
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update -y
+sudo apt-get install jenkins -y
+
+jenkins --version
+
+---You can enable the Jenkins service to start at boot with the command:
+
+sudo systemctl enable jenkins
+
+---You can start the Jenkins service with the command:
+
+sudo systemctl start jenkins
+
+---You can check the status of the Jenkins service using the command:
+
+sudo systemctl status jenkins
+
+kubeadm join 172.31.29.7:6443 --token cb7ixc.bdmrqhnurj
+
+pipeline{
+    agent any
+    tools{
+        maven 'maven_3.9.6'
+    }
+    stages{
+        stage("build maven"){
+            steps {
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Divyaraj-Mandale/bookyourslot.git']])
+                sh 'mvn clean install -D maven.test.skip=true'
+            }
+        }
+    }
+}
+
+avh8p2 --discovery-token-ca-cert-hash sha256:c42cd011f6040dde6c7178198cf1d298b808d51bfe7d62f1045000cf2e5c112b

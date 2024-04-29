@@ -1,0 +1,274 @@
+####create eks cluster with gitlab####
+
+step-1 Create 1 ec2 instance in
+
+create 1 ec2 instance in
+install git, java , docker, maven.
+
+---java install---------------------------------------------------------------------------------------------------
+
+sudo apt-get update
+sudo apt install openjdk-17-jre-headless -y
+java --version
+
+sudo apt-get remove openjdk-17-jre-headless -y
+
+---maven -------------------------------------------------------------------------------------------------------------------------------
+
+sudo apt update
+sudo apt-get install maven -y
+mvn --version
+
+sudo apt-get remove maven -y
+
+---docker -------------------------------------------------------------------------------------------------------------------------------
+
+sudo apt-get update
+sudo apt install docker.io -y
+sudo docker --version
+
+
+sudo apt-get remove docker docker-engine docker.io
+
+-------------------------------------------------------------------------------------------------------------------------------
+2.connect runner
+
+goto :- Peoject > settings > CICD > runner >
+
+  install runner before that check the Architecture
+  command - dpkg --print-architecture 
+  and select ruuner according to architecture
+  go to ruuner copy command and paste into ec2 for connection
+  give the proper information like
+                                                   
+Enter the GitLab instance URL (for example, https://gitlab.com/):[https://gitlab.com/]:- hit enter
+Enter the registration token:[GR1348941bkm4m-mAhWAUZRfjzuJu]:- hit enter
+Enter a description for the runner:[ip-172-31-35-203]:- hit enter
+Enter tags for the runner (comma-separated):- give any tag name remember we have to give that name inside yml file (ec2,server)
+Enter optional maintenance note for the runner:- hit enter
+Enter an executor: docker+machine, kubernetes, instance, custom, shell, parallels, virtualbox, ssh, docker, docker-windows, docker-autoscaler:- shell
+
+
+goto runner >  click on edit option > and check run without tag --if you want to run withut tag
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+step-3
+
+install eks on your ec2 instance-follow all below steps using this links
+https://www.fosstechnix.com/how-to-create-eks-cluster-in-aws-2-steps/
+
+install Kubectl using this link 
+https://www.cherryservers.com/blog/install-kubectl-ubuntu
+
+#1:Install eksctl CLI tool for creating EKS Clusters on AWS
+#2:Install Kubectl on Ubuntu
+#3:Install AWS CLI on Ubuntu
+#4:Create IAM User with full S3, EC2, Route53 and VPC access in AWS
+#5:Configure AWS CLI
+#6:How to Create EKS Cluster in AWS
+
+eksctl create cluster --name demo-ekscluster --region us-east-2 --version 1.28 --nodegroup-name linux-nodes --node-type t2.micro --nodes 2
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+step-4
+
+create agent in gitlab
+Installing the agent for Kubernetes
+https://docs.gitlab.com/ee/user/clusters/agent/install/
+
+create simple file with below name in main repo
+.gitlab/agents/{eks name}/config.yaml
+
+{
+gitops:
+  manifest_projects:
+  - id: 55650803
+    ref: # either `branch`, `tag` or `commit` can be specified
+      branch: main
+      # commit: <mysha>
+      # tag: v1.0
+    default_namespace: default
+    paths:
+      # Read all YAML files from this directory.
+    - glob: '/hello-deployment.yaml'
+      # Read all .yaml files from team2/apps and all subdirectories.
+    #- glob: '/team2/apps/**/*.yaml'
+      # If 'paths' is not specified or is an empty list, the configuration below is used.
+    #- glob: '/**/*.{yaml,yml,json}'
+    reconcile_timeout: 3600s
+    dry_run_strategy: none
+    prune: true
+    prune_timeout: 3600s
+    prune_propagation_policy: foreground
+    inventory_policy: must_match
+}
+
+Install helm using this link on ec2 
+https://phoenixnap.com/kb/install-helm
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+step-5
+
+connect above agent to kubernet cluster suing ec2 instance
+gitlab > operate > kubernet cluster > connect a cluster > and run all helm command to ec2 machine
+
+ex { 
+
+glagent-LjaUadxy2NeVPFyDpM4HEGHrvTAogjW_HSNjwQFyU5zLuYCnwg
+
+=> helm repo add gitlab https://charts.gitlab.io
+=> helm repo update
+=> helm upgrade --install raj-eks gitlab/gitlab-agent \
+    --namespace gitlab-agent-raj-eks \
+    --create-namespace \
+    --set image.tag=v16.10.1 \
+    --set config.token=glagent-LjaUadxy2NeVPFyDpM4HEGHrvTAogjW_HSNjwQFyU5zLuYCnwg \
+    --set config.kasAddress=wss://kas.gitlab.com
+}
+Now you will see agent is connected
+--------------------------------------------------------------------------------------------------------------------------------
+
+
+step-6
+create .gitlab-ci.yaml file
+{
+variables:
+    REPOSITORY: sachin-borde
+    IMAGE_TAG: latest
+    KUBE_CONTEXT: sachin-borde/SpringBootHelloWorld:sample1
+#default:
+ #   before_script:
+ #       - docker info
+
+stages:
+   # - build
+    - docker build
+    - docker push
+    - deploy to EKS
+
+
+build docker images:
+    stage: docker build
+    before_script:
+        - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
+    script:
+        - echo "Building app..."
+        - mvn clean install
+        - echo "Finished building the app."
+        - docker build -t $CI_REGISTRY .
+
+
+Push to registry:
+    stage: docker push
+    before_script:
+        - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
+    script:
+        - docker push $CI_REGISTRY
+
+
+deploy to eks:
+    stage: deploy to EKS
+    image:
+        name: bitnami/kubectl:latest
+        entrypoint: ['']
+    before_script:
+        - kubectl config use-context "$KUBE_CONTEXT"
+    script:
+        - kubectl apply -f hello-deployment.yaml
+}
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+step-7
+
+create deployment.yaml file 
+{
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      imagePullSecrets:
+      - name: registry-credentials 
+      containers:
+      - name: nginx
+        image: registry.gitlab.com/sachin-borde/springboothelloworld:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+}
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+step-8
+create secret file 
+Managing Kubernetes secrets in a GitOps workflow (deprecated)
+https://docs.gitlab.com/ee/user/clusters/agent/gitops/secrets_management.html
+
+
+
+
+
+docker build -t registry.gitlab.com/raj-mandale/spring-boot-hello-world-deploy-with-eks .
+
+to generate docker credential goto 
+gitlab > settings > pipeline > docker token > generate token > save username and password and use it in below command
+
+ex - username -- gitlab+deploy-token-4059323
+
+     token -- gldt-jxiwX2sZszYpYGxSBfSn
+
+root@ip-172-31-82-24:~# kubectl create secret docker-registry gitlab-credentials --docker-server=registry.gitlab.example.com --docker-username=<gitlab-username> --docker-password=<gitlab-token> --docker-email=<gitlab-user-email> -n <namespace> --dry-run=client -o yaml > gitlab-credentials.yaml
+root@ip-172-31-82-24:~# kubectl create secret docker-registry registry1-credentials --docker-server=registry.gitlab.example.com --docker-username=gitlab+deploy-token-4059323 --docker-password=gldt-jxiwX2sZszYpYGxSBfSn --dry-run=client -o yaml > registry1-credentials.yaml
+root@ip-172-31-82-24:~# ls
+registry-credentials.yaml  snap
+root@ip-172-31-82-24:~# cat registry-credentials.yaml 
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJyZWdpc3RyeS5naXRsYWIuZXhhbXBsZS5jb20iOnsidXNlcm5hbWUiOiJnaXRsYWIrZGVwbG95LXRva2VuLTQwMzk0OTIiLCJwYXNzd29yZCI6ImdsZHQtRHRWWW5HM0VYRlJuV0J5Rk03NGMiLCJhdXRoIjoiWjJsMGJHRmlLMlJsY0d4dmVTMTBiMnRsYmkwME1ETTVORGt5T21kc1pIUXRSSFJXV1c1SE0wVllSbEp1VjBKNVJrMDNOR009In19fQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: registry-credentials
+type: kubernetes.io/dockerconfigjson
+root@ip-172-31-82-24:~# kubectl apply -f registry-credentials.yaml 
+secret/registry-credentials created
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+step-9
+
+set variables as you can see in the ci.yaml file
+
+$CI_REGISTRY          --  registry.gitlab.com/raj-mandale/spring-boot-hello-world-deploy-with-eks
+$CI_DEPLOY_USER       --  gitlab+deploy-token-4059323
+$CI_DEPLOY_PASSWORD   --  gldt-jxiwX2sZszYpYGxSBfSn
+
+for CI_DEPLOY_USER and $CI_DEPLOY_PASSWORD
+goto > gitlab > settings > pipeline > docker token > generate token > save username and password
+--------------------------------------------------------------------------------------------------------------------------------
+

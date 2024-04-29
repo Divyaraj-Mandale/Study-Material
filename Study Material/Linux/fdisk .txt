@@ -1,0 +1,57 @@
+creating a partition using fdisk:-
+*********************************
+
+#fdisk <device name> --> to enter in fdisk mode.
+
+#lsblk
+
+#fdisk /dev/sdb
+
+command : m(for help)
+	: p  --> print
+	: n    --> to create new partition
+	: partition type(p/e):
+	:partition number[1-4]
+	:first sector  --> (default is 2047 )starting point of ur partition.
+	:last sector   --> (it should be in K,M,G,T): +3G 
+	:p
+	:w	--> to save and quit from fdisk mode.
+	
+#partporbe <device name>  -->to update disk changes to kernel.
+ex:#partprobe /dev/sdb
+
+to change the partition type:-
+******************************
+
+#fdisk /dev/sdc
+
+ command : p   --> print the disk & prtition info
+	 : t   --> to change partition type.
+	 : partition number[1-4]
+	 : hex code (to list all hex codes press l): l
+
+	 : hex code(8e,82,83):
+	 : w
+
+#partprobe /dev/sdc
+
+deleting a partition:-
+**********************
+
+#fdisk /dev/sdc
+command: p
+	: d    --> to delete a existing partition
+	: partition number[1-2, default 2]:
+	:p
+	:w
+
+#partprobe /dev/sdc
+
+#lsblk
+
+
+
+
+	
+
+ 

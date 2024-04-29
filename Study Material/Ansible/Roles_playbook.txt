@@ -1,0 +1,53 @@
+
+**************Rolls playbook**************
+
+[root@master ~]# cd /etc/ansible/
+[root@master ansible]# ls
+ansible.cfg  hosts  master.yml  roles
+[root@master ansible]# cat master.yml 
+---
+- hosts: web
+  roles:
+    - apache
+    - webserver
+[root@master ansible]# cd roles/
+[root@master roles]# ls
+apache  webserver
+[root@master roles]# cd apache/
+[root@master apache]# ls
+defaults  files  handlers  meta  README.md  tasks  templates  tests  vars
+[root@master apache]# cat tasks/main.yml 
+---
+  - name: Install httpd Package
+    yum: name= "{{ pkg1 }}" state=latest
+
+  - name: Start and Enable httpd service
+    service: name= "{{ srv1 }}" state=restarted enabled=yes
+
+  - name: Copy index.html file
+    copy: src=index.html dest=/var/www/html
+    notify:
+    - abcd
+[root@master apache]# cat handlers/main.yml 
+---
+  - name: abcd
+    service: name= "{{ pkg1 }}" state=restarted
+
+[root@master apache]# cat vars/main.yml 
+---
+pkg1: "httpd"
+srv1: "httpd"
+[root@master apache]# cat files/index.html 
+hi all **************************************************
+[root@master apache]# 
+
+
+
+
+
+
+
+
+
+
+

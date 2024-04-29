@@ -1,0 +1,32 @@
+ cat user-list.yaml
+---
+users:
+  - name: user1
+    uid: 2001
+  - name: user2
+    uid: 2002
+  - name: user3
+    uid: 2003
+[root@master playbooks]# cat user-var.yaml
+---
+- name : Writing Playbook Using Variables
+  hosts : web
+  vars :
+    user : karan1
+  tasks :
+  - name : Creating User
+    user :
+      name : "{{ user }}"
+[root@master playbooks]# cat users-var.yaml
+---
+- hosts: web
+  #become: yes
+  vars_files:
+    - user-list.yaml
+  tasks:
+      - name: add user in nodes
+        user:
+          name: "{{ item.name }}"
+          uid: "{{ item.uid }}"
+          state: present
+        loop: "{{ users }}"

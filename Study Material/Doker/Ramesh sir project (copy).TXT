@@ -1,0 +1,97 @@
+
+// backend code
+// file name backend.df
+FROM postgres
+ENV POSTGRES_DB=empdb
+
+
+
+//frontend code
+//file name frontend.df
+FROM openjdk:8-jdk-alpine
+ARG JAR_FILE=*.jar
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+
+  curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+  sudo chmod +x /usr/local/bin/docker-compose
+
+  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+  docker-compose --version
+  
+  
+  
+  
+  //file name project.yml
+  
+  version: "3.9"
+services:
+  application:
+build:
+context: .
+dockerfile: ./frontend.df
+    image: frontend:f1
+    ports:
+    - "9092:9092"
+    container_name: base
+    environment:
+- servername=database
+- username=postgres
+- password=1234
+    depends_on:
+- database
+  database:
+    build:
+context: .
+dockerfile: ./backend.df
+    image: backend:b1
+    ports:
+- "5432:5432"
+    container_name: db1
+    environment:
+- POSTGRES_USER=postgres
+- POSTGRES_PASSWORD=1234
+
+
+version: "3.9"
+services:
+  application:
+    build:
+      context: .
+      dockerfile: ./php.df
+    image: front:f1
+    container_name: d1
+    ports:
+    - "9095:80"
+    volumes:
+    - "/data:/var/www/html"
+    networks:
+      net2:
+        ipv4_address: 12.12.0.11
+    depends_on:
+    - database
+  database:
+    build:
+      context: .
+      dockerfile: ./mysql.df
+    image: backend:b1
+    container_name: db2
+    networks:
+      net2:
+        ipv4_address: 12.12.0.12
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_ROOT_PASSWORD=123
+networks:
+  net2:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+  - subnet: 12.12.0.0/24
+          gateway: 12.12.0.1

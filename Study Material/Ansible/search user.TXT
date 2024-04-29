@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo "Enter your name"
+read p
+if grep -w $p /etc/passwd &> /dev/null
+then
+        echo "$p exists"
+else  echo "$p does not exist"
+
+fi
+~                                                                                           
+~                                                                                           
+~                                                                                           
+~                               

@@ -1,0 +1,24 @@
+ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+  291    267  chmod +x get_helm.sh
+  292    268  ./get_helm.sh
+  293    269  helm version
+  294    270  export PATH=$PATH:/usr/local/bin
+  295    271  ./get_helm.sh
+  296    272  helm version
+  297    273  helm
+  298    274  wget -O helm.tar.gz https://get.helm.sh/helm-v3.5.4-linux-amd64.tar.gz
+  299    275  tar -zxvf helm.tar.gz
+  300    276  sudo mv linux-amd64/helm /usr/local/bin/helm
+  301    277  helm
+  302    278  helm repo add stable https://charts.helm.sh/stable
+  303    279  helm search repo jenkins
+  304    280  kubectl get nodes
+  305    281  elm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  306    282  helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+  307    283  helm repo update
+  308    284  helm install ingress-controller ingress-nginx/ingress-nginx
+  309    285  helm ls
+  310    286  kubectl get deployments
+  helm ls
+
+  

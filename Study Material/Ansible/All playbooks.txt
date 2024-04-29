@@ -1,0 +1,1223 @@
+[root@master playbooks]# su admin
+[admin@master playbooks]$ cd
+[admin@master ~]$ ls
+deploy
+[admin@master ~]$ cd deploy/
+[admin@master deploy]$ ls
+ansible.cfg  fact.yml     handler.yml   hostvar.yml  package.yml  var
+copy.yml     globvar.yml  hostvari.yml  inventory    user.yaml
+[admin@master deploy]$ cat user.yaml 
+---
+- name: sample
+  hosts: all
+  tasks:
+    - name: creating user
+      user:
+        name: santosh
+        state: present
+
+[admin@master deploy]$ cat package.yml 
+---
+- name: gameplay
+  hosts: all
+  tasks:
+  - name: creating user
+    user:
+      name: vigy
+      state: present
+    tags: creating for global
+  - name: installing package
+    yum:
+      name: httpd
+      state: present
+[admin@master deploy]$ cat copy.yml 
+---
+- name: joyplay
+  hosts: webserver
+  tasks:
+  - name: create user
+    user:
+      name: vignesh
+      state: present
+- name: gameplay
+  hosts: all
+  tasks:
+  - name: copy of file
+    copy:
+      src: /etc/hosts
+      dest: /tmp
+[admin@master deploy]$ 
+[admin@master deploy]$ cat fact
+cat: fact: No such file or directory
+[admin@master deploy]$ cat fact.yml 
+---      
+- name: testing facts
+  hosts: all
+  tasks: 
+  - name: to know info
+    debug:
+      msg: it means separator 
+        the fqdn is "{{ ansible_fqdn }}"
+        the default ip address "{{ ansible_default_ipv4.address }}"
+[admin@master deploy]$ cat hostvar.yml 
+--- 
+- name: playgood
+  hosts: all
+  vars:
+    pkg1: httpd
+    srv1: httpd
+  tasks:
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+[admin@master deploy]$ cat var 
+pkg1: httpd
+srv1: httpd
+user1: admin
+file1: /f1
+
+[admin@master deploy]$ cat globvar.yml 
+---
+- name: superplay
+  hosts: all
+  tasks:
+  - name: variable file
+    include_vars: /home/admin/deploy/var
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+  - name: creating user
+    user:
+      name: "{{ user1 }}"
+      state: present
+  - name: creating file
+    file:
+      dest: "{{ file1 }}"       
+      state: touch
+
+[admin@master deploy]$ ls
+ansible.cfg  copy.yml  fact.yml  globvar.yml  handler.yml  hostvari.yml  hostvar.yml  inventory  package.yml  user.yaml  var
+[admin@master deploy]$ cat hostvari.yml 
+--- 
+- name: playgood
+  hosts: all
+  tasks:
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+[admin@master deploy]$ cat handler.yml 
+---
+- name: demo task
+  hosts: all
+  tasks:
+  - name: installing the package
+    yum:
+      name: vsftpd
+      state: absent
+    notify:
+    - restarting the service
+  handlers:
+  - name: restarting the service
+    service:
+      name: vsftpd
+      state: restarted
+[admin@master deploy]$ ls
+ansible.cfg  copy.yml  fact.yml  globvar.yml  handler.yml  hostvari.yml  hostvar.yml  inventory  package.yml  user.yaml  var
+[admin@master deploy]$ cat ansible.cfg 
+[defaults]
+remote_user = admin
+inventory = /home/admin/deploy/inventory
+[privilege_escalation]
+become_method = sudo
+become_user = root
+become_ask_pass = False
+[admin@master deploy]$ cat inventory 
+[webserver]
+192.168.239.135 pkg1=vsftpd srv1=vsftpd
+
+[root@master ~]# ls
+abc.txt      epel-release-latest-7.noarch.rpm  global.yaml   hostvariabl.yml  index.php         loop1.yml  package.yml     tomcat7   variable.yml
+copy.yml     facts.yml                         glob.yml      hostvari.yml     intranet-web.yml  loop2.yml  play-debug.yml  tomcat9   volume-node1.yml
+ec2full.yml  filter.yml                        handler.yml   igror_err.yml    java.yml          loop.yml   project         user.yml  webserver.yml
+ec2.yml      globallogic.yml                   handller.yml  index.html       lamp.yml          multi.yml  resque.yml      var       when.yml
+[root@master ~]# 
+
+
+[root@master ~]# cat global.yaml
+---
+- hosts: all
+  tasks: 
+  - yum: 
+     name: wget
+     state: present
+  - yum:
+     name: vim
+     state: present 
+     
+[root@master ~]# cat global.yaml
+---
+- hosts: all
+  tasks: 
+  - yum: 
+     name: wget
+     state: present
+  - yum:
+     name: vim
+     state: present   
+[root@master ~]# cat  hostvariabl.yml
+--- 
+- name: playgood
+  hosts: web
+  tasks:
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+[root@master ~]# cat copy.yml
+---
+- name: joyplay
+  hosts: web
+  tasks:
+  - name: create user
+    user:
+      name: vignesh
+      state: present
+- name: gameplay
+  hosts: all
+  tasks:
+  - name: copy of file
+    copy:
+      src: /etc/hosts
+      dest: /tmp
+[root@master ~]# cat ec2full.yml
+---
+  - name: Provision an EC2 Instance
+    hosts: localhost
+    connection: local
+    gather_facts: False
+    tags: provisioning
+
+    vars:
+      instance_type: t2.micro
+      security_group: launch-wizard-6
+      image: ami-0568773882d492fc8
+      region: us-east-2
+      keypair: LG
+      count: 1
+
+    tasks:
+
+      - name: Create New security group with below given name
+        local_action:
+          module: ec2_group
+          name: "{{ security_group }}"
+          description: Security Group for Newly Created EC2 Instance
+          region: "{{ region }}"
+          rules:
+            - proto: tcp
+              from_port: 22
+              to_port: 22
+              cidr_ip: 0.0.0.0/0
+            - proto: tcp
+              from_port: 80
+              to_port: 80
+              cidr_ip: 0.0.0.0/0
+          rules_egress:
+            - proto: all
+              cidr_ip: 0.0.0.0/0
+
+
+      - name: Launch the new t2 micro EC2 Instance
+        local_action: ec2
+                      group={{ security_group }}
+                      instance_type={{ instance_type}}
+                      image={{ image }}
+                      wait=true
+                      region={{ region }}
+                      keypair={{ keypair }}
+                      count={{count}}
+        register: ec2
+
+      - name: Wait for EC2 Instance to Spin-up and ready for SSH access
+        local_action: wait_for
+                      host={{ item.public_ip }}
+                      port=22
+                      state=started
+        with_items: "{{ ec2.instances }}"
+
+      - name: Adding Tags to Identify
+        local_action: ec2_tag resource={{ item.id }} region={{ region }} state=present
+        with_items: "{{ ec2.instances }}"
+        args:
+          tags:
+             Name: Web Server
+             
+             
+[root@master ~]# cat ec2.yml
+---
+- name: localhost
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Launching ec2 instance
+      ec2:
+        instance_type: t2.micro
+        key_name: LG
+        image: ami-0568773882d492fc8
+        region: us-east-2 
+        group: launch-wizard-6
+        count: 10
+        vpc_subnet_id: subnet-08bdc85f753941b3e
+        wait: yes
+        assign_public_ip: yes
+[root@master ~]# cat facts.yml
+---      
+- name: testing facts
+  hosts: all
+  tasks: 
+  - name: to know info
+    debug:
+      msg: it means separator 
+        the fqdn is "{{ ansible_fqdn }}"
+        the default ip address "{{ ansible_default_ipv4.address }}"
+[root@master ~]# cat filter.yml 
+---
+- name: to use of tags
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: operating use of tag1
+      debug:
+        msg:
+          - " this is debug msg1"
+      tags:
+        - first
+    - name: operating use of tag2
+      debug:
+        msg:
+          - " this is debug msg2"
+      tags:
+        - second
+    - name: operating use of tag3
+      debug:
+        msg:
+          - " this is debug msg3"
+      tags:
+        - third
+    - name: operating use of tag4
+      debug:
+        msg:
+          - " this is debug msg4"
+      tags:
+        - first
+[root@master ~]# globallogic.yml
+bash: globallogic.yml: command not found
+[root@master ~]# cat globallogic.yml
+---
+- name: superplay
+  hosts: all
+  remote_user: admin
+  become_method: sudo
+  become_user: root
+  become_ask_pass: False
+  vars:
+    pkg1: httpd
+    srv1: httpd
+    user1: admin
+    file1: /f1
+  tasks:
+  - name: variable file
+    include_vars: /home/admin/deploy/var
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+  - name: creating user
+    user:
+      name: "{{ user1 }}"
+      state: present
+  - name: creating file
+    file:
+      dest: "{{ file1 }}"       
+      state: touch
+      
+      
+[root@master ~]# cat  glob.yml 
+---
+- name: superplay
+  hosts: all
+  vars:
+    pkg1: httpd
+    srv1: httpd
+    user1: admin
+    file1: /f1
+  tasks:
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+  - name: creating user
+    user:
+      name: "{{ user1 }}"
+      state: present
+  - name: creating file
+    file:
+      dest: "{{ file1 }}"       
+      state: touch
+[root@master ~]# cat handler.yml 
+---
+- name: demo task
+  hosts: all
+  tasks:
+  - name: installing the package
+    yum:
+      name: vsftpd
+      state: absent
+    notify:
+    - restarting the service
+  handlers:
+  - name: restarting the service
+    service:
+      name: vsftpd
+      state: restarted
+[root@master ~]# cat handller.yml
+---
+- name: testing
+  hosts: web
+  tasks:
+    - name: Install
+      yum:
+        name: httpd
+        state: present
+      notify: abcd
+  handlers:
+    - name: abcd
+      service:
+        name: httpd
+        state: restarted
+[root@master ~]# cat hostvari.yml
+--- 
+- name: playgood
+  hosts: all
+  vars:
+    pkg1: httpd
+    srv1: httpd
+  tasks:
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+      
+      
+[root@master ~]# cat igror_err.yml
+---
+- name: error
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - block:
+       - command: "ls /root/tomcat7"
+         register: tomcat7_out
+       - command: "ls /root/tomcat8"
+         register: tomcat8_out
+
+       - command: "ls /root/tomcat9"
+         register: tomcat9_out
+      ignore_errors: yes
+    - debug: var=tomcat7_out
+    - debug: var=tomcat8_out
+    - debug: var=tomcat9_out
+[root@master ~]# cat intranet-web.yml
+---
+- name: Enable Intranet website
+  hosts: db
+  tasks:
+    - name: Install latest versionof https and firewall
+      yum:
+        name:
+          - httpd
+          - firewalld
+        state: latest
+    - name: test html page is added
+      copy:
+        src: /root/index.html
+        dest: /var/www/html/index.html
+    - name: Firewall
+      service:
+        name : firewalld
+        enabled: true
+        state: started
+    - name: Firewall permit access
+      firewalld:
+        service: http
+        permanent: true
+        immediate: yes
+        state: enabled
+    - name: Https and eunning
+      service:
+        name: httpd
+        enabled: true
+        state: started
+[root@master ~]# cat java.yml 
+---
+- name: Install jdk and Tomcat
+  hosts: all
+  tasks:
+  - name:
+    yum:
+      name: java
+      state: latest
+  - name: Download the tomcat
+    get_url:
+      url: https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.82/bin/apache-tomcat-8.5.82.tar.gz
+      dest: /usr/local
+  - name: Extract the zip file
+    unarchive:
+      src: /usr/local/apache-tomcat-8.5.82.tar.gz
+      dest: /usr/local
+      remote_src: yes
+  - name: start the tomcat
+    shell: nohup /usr/local/apache-tomcat-8.5.82/bin/startup.sh
+[root@master ~]# cat lamp.yml 
+---
+- hosts: web
+  remote_user: root
+
+
+  tasks:
+    - name: Installing Apache
+      yum:
+        name: httpd
+        state: installed
+
+    - name: Enabling httpd service and start the service
+      service:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Install MYSQL DB Community edition
+      yum:
+        name:
+          - mariadb-server
+          - mariadb
+        state: latest
+
+    - name: Start the MYSQL service
+      service:
+        name: mariadb
+        enabled: yes
+        state: started
+
+
+    - name: Installing PHP
+      yum:
+        name:
+          - php
+          - php-mysql
+        state: latest
+
+    - name: Copying your php file in the /var/www/html
+      copy:
+        src: ./index.php
+        dest: /var/www/html/index.php
+        
+        
+[root@master ~]# cat loop.yml
+---
+ - name: sample loop
+   hosts: web
+   tasks:
+     - name: Add lists of users
+       user: name="{{item}}" state=present
+       with_items:
+         - mobile
+         - red
+         - blue
+         - black
+[root@master ~]# cat loop1.yml
+---
+- name: sample
+  hosts: all
+  tasks:
+    - name: Installing pkg
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - vim
+        - docker
+        - wget
+        - tree
+[root@master ~]# cat loop2.yml
+---
+- name: creating user wsing selected
+  hosts: web
+  tasks:
+    - name: Creating user
+      user:
+        name: "{{ item.name }}"
+        state: present
+        shell: /bin/sh
+        createhome: yes
+        home: /tmp/"{{ item.name }}"
+        groups: "{{ item.groups }}"
+      loop:
+        - name: user1
+          groups: ec2-user
+        - name: user2
+          groups: root
+[root@master ~]# cat multi.yml
+---
+- name: Multifunction
+  hosts: web
+  tasks: 
+    - name: Adding line
+      lineinfile:
+        path: /etc/motd
+        line: "welcome to raj scren {{ ansible_facts.distribution }} "
+        state: present
+
+    - name: debug
+      stat:
+        path: /etc/passwd
+      register: result
+
+    - name: Display the stat result
+      debug: var=result
+      
+      
+[root@master ~]# cat package.yml
+---
+- name: gameplay
+  hosts: all
+  tasks:
+  - name: creating user
+    user:
+      name: vigy
+      state: present
+    tags: creating for global
+  - name: installing package
+    yum:
+      name: httpd
+      state: present
+[root@master ~]# cat play-debug.yml
+---
+- name: Debug test
+  hosts: web
+  tasks:
+    - name: Detail info
+      debug:
+        msg: "System {{ inventory_hostname }} has uuid {{ ansible_product_uuid }}"
+        
+    - debug:
+        msg: "System {{ ansible_distribution }} has gateway {{ ansible_default_ipv4.gateway }}"
+
+    - shell: /usr/bin/uptime
+      register: result
+
+    - debug:
+        var: result
+        verbosity: 1
+        
+        
+        
+[root@master ~]# cat project
+cat: project: Is a directory
+[root@master ~]# resque.yml
+bash: resque.yml: command not found
+[root@master ~]# cat resque.yml
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - block:
+      - name: findind files in pwd
+        command: "ls /root/tomcat7"
+        register: tomcat8_out
+      rescue:
+      - debug:
+          msg: "the given path in /root/tomcat8 is not valid"
+      always:
+      - debug:
+          msg: "always enjoy"
+[root@master ~]# cat user.yml
+---
+- name: Configure User
+  hosts: all
+  tasks:
+    - name: create user
+      user:
+        name: abc
+        uid: 4000
+        state: present
+
+[root@master ~]# cat var
+pkg1: httpd
+srv1: httpd
+user1: raj
+file1: /f1
+
+
+[root@master ~]# ls
+abc.txt      epel-release-latest-7.noarch.rpm  global.yaml   hostvariabl.yml  index.php         loop1.yml  package.yml     tomcat7   variable.yml
+copy.yml     facts.yml                         glob.yml      hostvari.yml     intranet-web.yml  loop2.yml  play-debug.yml  tomcat9   volume-node1.yml
+ec2full.yml  filter.yml                        handler.yml   igror_err.yml    java.yml          loop.yml   project         user.yml  webserver.yml
+ec2.yml      globallogic.yml                   handller.yml  index.html       lamp.yml          multi.yml  resque.yml      var       when.yml
+[root@master ~]# cat variable.yml
+---
+- name: superplay
+  hosts: all
+  tasks:
+  - name: variable file
+    include_vars: /root/var
+  - name: installing package
+    yum:
+      name: "{{ pkg1 }}"
+      state: present
+  - name: installing service
+    service:
+      name: "{{ srv1 }}"
+      state: started
+      enabled: yes
+  - name: creating user
+    user:
+      name: "{{ user1 }}"
+      state: present
+  - name: creating file
+    file:
+      dest: "{{ file1 }}"       
+      state: touch
+[root@master ~]# cat volume-node1.yml
+---
+- name: tocreate partition
+  hosts: db
+  tasks:
+    - name: create 2gb partition
+      parted:
+        device: /dev/sdf
+        number: 1
+        state: present
+        part_start: 1MiB
+        part_end: 2GiB
+    - name: formate the disk partition
+      filesystem:
+        fstype: xfs
+        dev: /dev/sdf1
+    - name: create directory
+      file:
+        dest: /data
+        state: directory
+    - name: Mount the partion
+      mount:
+        path: /data
+        src: /dev/sdf1
+        fstype: xfs
+        state: mounted
+[root@master ~]# cat  webserver.yml
+---
+ - name: set a WEB Server
+   hosts: web
+   vars:
+     web_pkg: httpd
+     firewall_pkg: firewalld
+     web_service: httpd
+     rule: http
+   tasks:
+   - name: Installing Webserver & Firewalld
+     yum:
+      name:
+        - "{{ web_pkg}}"
+        - "{{firewall_pkg}}"
+   - name: Ensure Firewall service is started
+     service:
+       name: "{{firewall_pkg}}"
+       state: started
+       enabled: true
+   - name: Ensure Apache service is started
+     service:
+       name: "{{ web_service }}"
+       state: started
+       enabled: true
+   - name: Define index.html file
+     copy:
+       content: "setting web server for Global logic"
+       dest: /var/www/html/index.html
+   - name: Adding http to Firewall Rull
+     firewalld:
+       service: "{{ rule }}"
+       permanent: true
+       immediate: true
+       state: enabled
+[root@master ~]# cat when.yml
+---
+- name: Install nmap
+  hosts: web
+  tasks:
+    - name: Install nmap
+      yum:
+        name: nmap
+        state: present
+      loop: "{{ ansible_mounts }}"
+      when: item.mount == "/" and item.size_available > 500000                         
+      
+      
+**********************************docker-compose.yml**********************************************************
+
+[root@terraform ansible-project]# cat docker-compose.yml 
+---
+- hosts: jenkins
+  become: true
+  tasks:
+    - name: Install docker-compose
+      get_url: 
+        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '+x'
+    - name: move it
+      shell: sudo ln -s /usr/local/bin/docker-compose  /usr/bin/docker-compose
+      
+  ******************************git.yml*************************************
+      
+[root@terraform ansible-project]# cat git.yml 
+---
+- hosts: jenkins
+  tasks:
+    - name: Install git
+      yum:
+       name: git
+       state: present
+       update_cache: yes
+       
+***************************jenkins.yml *****************************************************
+  
+[root@terraform ansible-project]# cat jenkins.yml 
+---
+- hosts: jenkins
+  become: yes
+  #  remote_user: ec2-user
+  #  become_user: root
+  tasks:
+  - name: Download Long Term Jenkins release
+    get_url:
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+
+  - name: Import jenkins key from url
+    ansible.builtin.rpm_key:
+      state: present
+      key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+  - name: yum update
+    yum:
+      name: '*'
+      state: latest
+
+      #  - name: Install java
+      #    yum:
+      #      name: java-openjdk11
+      #      state: present
+  - name:
+    yum:
+      name: java
+      state: latest
+
+  - name: Install jenkins
+    yum:
+      name: jenkins
+      state: latest
+
+  - name: daemon-reload to pick up config changes
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Start jenkins
+    ansible.builtin.systemd:
+      name: jenkins
+      state: started
+      
+************************docker.yml ************************************************
+   
+[root@terraform ansible-project]# cat docker.yml 
+## Playbook to install docker
+---
+- name: install docker
+  hosts: jenkins
+  tasks:
+    - name: Enable Some packages from amazon-linux-extras packages
+      shell: "amazon-linux-extras enable python3.8 ansible2 docker"
+    - name: clean yum metadata cache
+      command: yum clean metadata
+      args:
+        warn: false
+    - name: Ensure a list of yum packages are installed
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+        - python3.8
+        - ansible
+        - docker
+    - name: Enable Docker CE service at startup
+      service:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Upgrade pip3
+      shell: "python3.8 -m pip install pip --upgrade"
+    - name: Ensure Python pip packages are installed
+      pip:
+        name: "{{ packages }}"
+        executable: /usr/local/bin/pip3.8
+      vars:
+        packages:
+        - boto
+        - boto3
+        - docker-compose
+        
+**********************************************************************************
+
+[root@terraform ansible-project]# ls
+docker-compose.yml  docker.yml  git.yml  jenkins.yml
+[root@terraform ansible-project]# cat docker-compose.yml 
+---
+- hosts: stage
+  become: true
+  tasks:
+    - name: Install docker-compose
+      get_url: 
+        url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '+x'
+    - name: move it
+      shell: sudo ln -s /usr/local/bin/docker-compose  /usr/bin/docker-compose
+[root@terraform ansible-project]# cat docker.yml 
+## Playbook to install docker
+---
+- name: install docker
+  hosts: jen
+  tasks:
+    - name: Enable Some packages from amazon-linux-extras packages
+      shell: "amazon-linux-extras enable python3.8 ansible2 docker"
+    - name: clean yum metadata cache
+      command: yum clean metadata
+      args:
+        warn: false
+    - name: Ensure a list of yum packages are installed
+      yum:
+        name: "{{ packages }}"
+        state: latest
+        update_cache: yes
+      vars:
+        packages:
+        - python3.8
+        - ansible
+        - docker
+    - name: Enable Docker CE service at startup
+      service:
+        name: docker
+        state: started
+        enabled: yes
+    - name: Upgrade pip3
+      shell: "python3.8 -m pip install pip --upgrade"
+    - name: Ensure Python pip packages are installed
+      pip:
+        name: "{{ packages }}"
+        executable: /usr/local/bin/pip3.8
+      vars:
+        packages:
+        - boto
+        - boto3
+        - docker-compose
+[root@terraform ansible-project]# cat git.yml 
+---
+- hosts: jen 
+  tasks:
+    - name: Install git
+      yum:
+       name: git
+       state: present
+       update_cache: yes
+[root@terraform ansible-project]# cat jenkins.yml 
+---
+- hosts: jenkins
+  become: yes
+  #  remote_user: ec2-user
+  #  become_user: root
+  tasks:
+  - name: Download Long Term Jenkins release
+    get_url:
+      url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      dest: /etc/yum.repos.d/jenkins.repo
+
+  - name: Import jenkins key from url
+    ansible.builtin.rpm_key:
+      state: present
+      key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+  - name: yum update
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Install java
+    yum:
+      name: java
+      state: latest
+
+  - name: Install jenkins
+    yum:
+      name: jenkins
+      state: latest
+
+  - name: daemon-reload to pick up config changes
+    ansible.builtin.systemd:
+      daemon_reload: yes
+
+  - name: Start jenkins
+    ansible.builtin.systemd:
+      name: jenkins
+      state: started
+   
+[root@terraform ansible-project]# cat java.yml 
+---
+- name: Install jdk 
+  hosts: stage
+  tasks:
+  - name:
+    yum:
+      name: java
+      state: latest
+      
+      
+********************************************************************************************************
+
+
+[jenkins]
+172.31.16.230
+
+[stage]
+172.31.30.208
+
+[jen]
+172.31.16.230
+172.31.30.208
+
+*******************************k8s***********************************************
+
+
+
+https://github.com/networknuts/ansible-k8s-setup
+
+
+[root@ansible ansible-k8s-setup]# ls
+ansible.cfg  hosts  k8s-master.yml  k8s-pkg.yml  k8s-workers.yml  README.md
+[root@ansible ansible-k8s-setup]# cat hosts
+[masters]
+master.example.com
+
+[workers]
+172.31.83.42
+172.31.91.136
+[root@ansible ansible-k8s-setup]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost6 localhost6.localdomain6
+
+172.31.82.82 ansible
+172.31.2.10 master.example.com master
+172.31.83.42 node1
+172.31.91.136 node2
+[root@ansible ansible-k8s-setup]# inventory      = /root/ansible-k8s-setup/hosts
+bash: inventory: command not found
+[root@ansible ansible-k8s-setup]# ### Entry in ansible.cfg
+
+
+vi k8s-pkg.yml
+[root@ansible ansible-k8s-setup]# cat k8s-pkg.yml
+- hosts: all
+  become: yes
+  tasks:
+
+    # - name: disable firewall service for labs
+    # service:
+    #  name: firewalld
+    #  state: stopped
+    #  enabled: false
+
+   - name: Disable SWAP
+     shell: |
+       swapoff -a
+
+   - name: Disable SWAP in fstab
+     lineinfile:
+       path: /etc/fstab
+       regexp: 'swap'
+       state: absent
+
+   - name: install Docker
+     yum:
+       name: docker
+       state: present
+       update_cache: true
+
+   - name: start Docker
+     service:
+       name: docker
+       state: started
+       enabled: true
+
+   - name: disable SELinux
+     command: setenforce 0
+     ignore_errors: yes
+
+     #- name: disable SELinux on reboot
+     #selinux:
+     #  state: disabled
+
+   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
+      state: present
+
+   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: 1
+      state: present
+
+   - name: add Kubernetes YUM repository
+     yum_repository:
+      name: Kubernetes
+      description: Kubernetes YUM repository
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      gpgcheck: yes
+
+   - name: install kubelet
+     yum:
+        name: kubelet-1.14.0
+        state: present
+        update_cache: true
+
+   - name: install kubeadm
+     yum:
+        name: kubeadm-1.14.0
+        state: present
+
+   - name: start kubelet
+     service:
+       name: kubelet
+       enabled: yes
+       state: started
+
+- hosts: masters
+  become: yes
+  tasks:
+   - name: install kubectl
+     yum:
+        name: kubectl-1.14.0
+        state: present
+        allow_downgrade: yes
+
+        #- hosts: all
+        #  become: yes
+        #  tasks:
+        #   - name: reboot ALL machines
+        #     reboot:
+
+
+
+vi k8s-workers.yml
+
+- hosts: masters
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
+
+    - name: set join command
+      set_fact:
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+
+- hosts: workers
+  become: yes
+  tasks:
+    - name: join cluster
+      shell: "{{ hostvars['master.example.com'].join_command }} --ignore-preflight-errors all  >> node_joined.txt"
+      args:
+        chdir: $HOME
+        creates: node_joined.txt
+
+vi k8s-master.yml
+
+- hosts: masters
+  become: yes
+  tasks:
+    - name: initialize K8S cluster
+      shell: kubeadm init --pod-network-cidr=172.16.0.0/16 ##--apiserver-advertise-address=10.0.0.100
+
+    - name: create .kube directory
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: 0755
+
+    - name: copy admin.conf to user kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /root/.kube/config
+        remote_src: yes
+
+    - name: install Pod network
+      become: yes
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+      args:
+        chdir: $HOME
+        creates: pod_network_setup.txt
+
+

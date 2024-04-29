@@ -1,0 +1,113 @@
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo systemctl status docker
+sudo docker run hello-world
+
+2. Remove any Docker files that are running in the system, using the following command:
+
+sudo apt-get remove docker docker-engine docker.io
+
+3. Check if the system is up-to-date using the following command:
+
+sudo apt-get update
+
+4. Install Docker using the following command:
+
+sudo apt install docker.io -y
+
+5. Install all the dependency packages using the following command:
+
+sudo snap install docker
+
+6. Before testing Docker, check the version installed using the following command:
+
+docker --version
+
+7. Pull an image from the Docker hub using the following command:
+
+sudo docker run hello-world
+
+Here, hello-world is the docker image present on the Docker hub.
+
+8. Check if the docker image has been pulled and is present in your system using the following command:
+
+sudo docker images
+
+9. To display all the containers pulled, use the following command:
+
+sudo docker ps -a
+
+10. To check for containers in a running state, use the following command:
+
+sudo docker ps
+
+11.Login into docker hub provide username and password
+
+sudo docker login
+
+12.move to the folder where you dockerfile is to build image container
+
+sudo docker build Dockerfile -t  helloworld .
+sudo docker build -f Dockerfile -t helloworld .
+
+13.to stop/delete the running docker containers
+
+sudo docker stop container_id
+
+14.to kill the process of running docker containers
+
+sudo docker kill container_id
+
+15.to see the stopped docker containers
+
+sudo docker ps -a
+
+16.to delete the image
+
+sudo docker rmi image_id
+
+17.to delete the image forcefully
+
+sudo docker rmi -f image_id
+
+18.to remove all stopped container 
+
+sudo docker container prune
+
+19.to create container from the image
+
+sudo docker build -t springboothelloworld-3.2.3.jar .
+
+20.to run the docker container
+
+sudo docker run -p 8080:8080 springboothelloworld-3.2.3.jar
+sudo docker run -p 8080:8080 -d springboothelloworld-3.2.3.jar
+
+21.to push the image to docker hub
+
+sudo docker tag helloworld sachinborde/helloworld
+sudo docker push sachinborde/helloworld
+
+#Stop all Docker containers:
+sudo docker stop $(sudo docker ps -a -q)
+
+#Remove all Docker containers:
+sudo docker rm $(sudo docker ps -a -q)
+
+#Remove Docker images:
+sudo docker rmi -f $(sudo docker images -a -q)
+
+#Uninstall the Docker package:
+sudo apt-get purge docker-ce docker-ce-cli containerd.io
+
+#Remove Docker configuration and persistent data:
+sudo rm -rf /var/lib/docker
+sudo rm -rf /etc/docker
+
+# Check if the Docker service is still running:
+sudo systemctl status docker
+
+# If it's running, stop it:
+sudo systemctl stop docker
+
+docker --version

@@ -1,0 +1,100 @@
+1. install below on ec2
+  java 
+  maven
+  docker
+  
+2.connect runner
+  install runner before that check the Architecture
+  command - dpkg --print-architecture and select ruuner according to architecture
+  go to ruuner copy command and paste into ec2 for connection
+  
+3.Shell profile loading
+
+To troubleshoot this error, check /home/gitlab-runner/.bash_logout. 
+For example, if the .bash_logout file has a script section like the following, 
+comment it out and restart the pipeline:
+before :-
+if [ "$SHLVL" = 1 ]; then
+    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+fi
+after :-
+#if [ "$SHLVL" = 1 ]; then
+#  		[ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#fi
+
+4.to check the jar
+goto path in ec2 -/home/gitlab-runner/builds/UQQBACds/0/sachin-borde/SpringBootHelloWorld/target/
+
+5.give the permission to docker.sock to perform the operation on docker
+command - chmod 777 /var/run/docker.sock
+
+6.set the login credential for docker in gitlab variable
+goto > setting > variable > add variable
+dont put the pass word as it is - goto docker hub generate token and put as a password
+
+7.run the image on ec2-public host:port
+
+8.(.gitlab-ci.yml)
+
+(Notes - $user - username of dockerhub 
+		$pass - password of dockerhub)
+9dont use direct value of username or password instead of that use variablke which is declare in gtilab variable)
+
+stages:
+    - build
+    - deploy_a
+    - deploy_b
+    - deploy_c
+
+build:
+    stage: build
+    image:  maven:3.6.1-jdk-8-slim
+    script:
+        - echo "Building app..."
+        - mvn clean install
+        - echo "Finished building the app."
+    artifacts:
+        expire_in: 1 week
+        paths:
+            - target/helloworld.jar
+    tags:
+        - ec2
+        - server
+
+deploy_image:
+    stage: deploy_a
+    script:
+        - echo "building image"
+        - docker build . -t $user/springboot:hello
+        - echo "Finished building image."
+    tags:
+        - ec2
+        - server
+
+deploy_push:
+    stage: deploy_b
+    script:
+        - echo "building con"
+        - docker login -u $user -p $pass
+        - docker push $user/springboot:hello
+        - echo "Finished building con."
+    tags:
+        - ec2
+        - server
+
+deploy_con:
+    stage: deploy_c
+    script:
+        - echo "building con"
+        - docker run -it -d --name sachin -p 8080:8080 $user/springboot:hello
+        - echo "Finished building con."
+    tags:
+        - ec2
+        - server
+
+9. (Dockerfile)
+
+FROM openjdk:17-alpine
+EXPOSE 8080
+ADD target/helloworld.jar helloworld
+ENTRYPOINT ["java", "-jar","helloworld"]

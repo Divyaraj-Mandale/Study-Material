@@ -1,0 +1,103 @@
+creating a partition using gdisk:-
+*********************************
+#yum install gdisk -y   --> to install gdisk package.
+
+#gdisk <device name>  
+ex:#gdisk /dev/sdb
+command :? --> help
+ 	:n --> create a new partition
+	:partition number[1-4]
+	:first sector[2048]
+	:last sector[+K,M,G,T]
+	:w   --> to write & exit
+
+#partprobe /dev/sdb   --> updating changes to kernel.
+
+#lsblk  --> to verify
+
+deleting  a partition using gdisk:-
+***********************************
+
+#gdisk /dev/sdb
+
+#command : p  --> print
+	 :d  --> delete a prtition
+	 : partition number[1-4]
+	 :w
+
+#partprobe /dev/sdb  --> updating changes to kernel.
+
+creating  a partition using parted:-
+***********************************
+#parted <device name>  
+ex:#parted /dev/sdb
+
+command :help --> to help
+	:p --> print
+	:mkpart
+	:patition name[]?
+	:file system[ext2]
+	:start?(1 as starting point)
+	:end (give in terms of MB'S  ex:2048)
+	:print
+	:quit
+
+#partprobe /dev/sdb  --> updating changes to kernel.
+
+deleting partitions using parted:-
+**********************************
+
+#parted /dev/sdb
+
+command :p --> print
+	:rm <partiton  number> 
+	:rm 1
+	:print
+	:quit
+
+#partprobe /dev/sdb --> update changes to kernel.
+
+
+filesystem:-
+***********
+it is a layer added on hard disk or paartition to give read and write access to operating system.
+--> the device without filesystem is called as raw device.
+--> the device with filesystem is called as block device.
+
+note:- mkfs is the command used to assign filesystem in linux os.
+
+types of filesystem in linux:-
+******************************
+1)ext2
+2)ext3
+3)ext4
+4)xfs
+
+
+difference ext2/ext3/ext4/xfs:-
+******************************
+
+feature			ext2			ext3			ext4			xfs	
+*******			****			****			****			***
+jornaling		not available		available		available		available
+invented year		1993			2001			2008			2012
+max file size		2TB			2TB			16TB			2EB
+max fs size		32TB			32TB			1EB			8EB
+max directories		32K			32K			64K			64K
+
+
+#mkfs.<filesystem> <device/partition name>  --> to assign a filesystem.
+
+ex:1)#mkfs.ext2 /dev/sdb1
+
+   2)#mkfs.xfs /dev/sdb2
+
+
+
+			
+
+
+
+
+
+

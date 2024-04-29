@@ -1,0 +1,153 @@
+[root@test global1]# kubectl config get-contexts
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin
+[root@test global1]# kubectl config set-context global1-context --cluster=kubernetes --namespace=development --user=global1
+Context "global1-context" created.
+[root@test global1]# kubectl config get-contexts
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+          global1-context               kubernetes   global1            development
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin
+[root@test global1]# clear
+[root@test global1]# kubectl --context=global1.context get pods
+Error in configuration: context was not found for specified context: global1.context
+[root@test global1]# kubectl --context=global1-context get pods
+Error from server (Forbidden): pods is forbidden: User "global1" cannot list resource "pods" in API group "" in the namespace "development"
+[root@test global1]# kubectl --context=global1-context get pods -n development
+Error from server (Forbidden): pods is forbidden: User "global1" cannot list resource "pods" in API group "" in the namespace "development"
+[root@test global1]# vi role.yml
+[root@test global1]# vi role.yml
+[root@test global1]# kuebctl get ns
+bash: kuebctl: command not found
+[root@test global1]# kubectl get ns
+NAME              STATUS   AGE
+default           Active   2d6h
+development       Active   15m
+google            Active   2d
+kube-node-lease   Active   2d6h
+kube-public       Active   2d6h
+kube-system       Active   2d6h
+samosa            Active   5h31m
+[root@test global1]# kubectl create -f role.yml
+error: resource mapping not found for name: "developer" namespace: "development" from "role.yml": no matches for kind "Role" in version "rbac.authorization.k8s.io/v1beta1"
+ensure CRDs are installed first
+[root@test global1]# vi role.yml
+[root@test global1]# kubectl create -f role.yml
+error: resource mapping not found for name: "developer" namespace: "development" from "role.yml": no matches for kind "Role" in version "rbac.authorization.k8s.io/v1beta1"
+ensure CRDs are installed first
+[root@test global1]# vi role.yml
+[root@test global1]# kubectl create -f role.yml
+error: resource mapping not found for name: "developer" namespace: "development" from "role.yml": no matches for kind "Role" in version "rbac.authorization.k8s.io/v1beta1"
+ensure CRDs are installed first
+[root@test global1]# vi role.yml
+[root@test global1]# vi role.yml
+[root@test global1]# kubectl create -f role.yml
+role.rbac.authorization.k8s.io/developer created
+[root@test global1]# kubectl get role
+No resources found in default namespace.
+[root@test global1]# kubectl get role -n development
+NAME        CREATED AT
+developer   2022-08-12T11:59:08Z
+[root@test global1]# vi role.yml
+[root@test global1]# kubectl describe role1 developer -n development
+error: the server doesn't have a resource type "role1"
+[root@test global1]# kubectl describe role developer -n development
+Name:         developer
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources               Non-Resource URLs  Resource Names  Verbs
+  ---------               -----------------  --------------  -----
+  deployments             []                 []              [list get watch create update patch delete]
+  pods                    []                 []              [list get watch create update patch delete]
+  replicasets             []                 []              [list get watch create update patch delete]
+  deployments.apps        []                 []              [list get watch create update patch delete]
+  pods.apps               []                 []              [list get watch create update patch delete]
+  replicasets.apps        []                 []              [list get watch create update patch delete]
+  deployments.extensions  []                 []              [list get watch create update patch delete]
+  pods.extensions         []                 []              [list get watch create update patch delete]
+  replicasets.extensions  []                 []              [list get watch create update patch delete]
+[root@test global1]# kubectl create role role1 --verb=get,list,watch,create,delete --resources=deployments,pods -n development
+error: unknown flag: --resources
+See 'kubectl create role --help' for usage.
+[root@test global1]# kubectl create role role1 --verb=get,list,watch,create,delete --resources=deployments,pods -n development
+error: unknown flag: --resources
+See 'kubectl create role --help' for usage.
+[root@test global1]# kubectl create role role1 --verb=get,list,watch,create,delete --resources=deployment,pods -n development
+error: unknown flag: --resources
+See 'kubectl create role --help' for usage.
+[root@test global1]# kubectl get role -n development
+NAME        CREATED AT
+developer   2022-08-12T11:59:08Z
+[root@test global1]# kubectl create role role1 --verb=get,list,watch,create,delete --resources=deployment,pods -n development
+error: unknown flag: --resources
+See 'kubectl create role --help' for usage.
+[root@test global1]# kubectl create role role1 --verb=get,list,watch,create,delete --resource=deployment,pods -n development
+role.rbac.authorization.k8s.io/role1 created
+[root@test global1]# kubectl get role -n development
+NAME        CREATED AT
+developer   2022-08-12T11:59:08Z
+role1       2022-08-12T12:07:13Z
+[root@test global1]# ls
+global1.csr  role.yml
+[root@test global1]# kubectl get role -n development
+NAME        CREATED AT
+developer   2022-08-12T11:59:08Z
+role1       2022-08-12T12:07:13Z
+[root@test global1]# vi role.yml
+[root@test global1]# vi rolebinding.yml
+[root@test global1]# kubectl create -f rolebinding.yml -n development
+rolebinding.rbac.authorization.k8s.io/developer-role-binding created
+[root@test global1]# vi rolebinding.yml
+[root@test global1]# kubectl get role -n developemnt
+No resources found in developemnt namespace.
+[root@test global1]# kubectl get role -n developmnt
+No resources found in developmnt namespace.
+[root@test global1]# kubectl get role -n development
+NAME        CREATED AT
+developer   2022-08-12T11:59:08Z
+role1       2022-08-12T12:07:13Z
+[root@test global1]# kubectl describe role developer -n development
+Name:         developer
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources               Non-Resource URLs  Resource Names  Verbs
+  ---------               -----------------  --------------  -----
+  deployments             []                 []              [list get watch create update patch delete]
+  pods                    []                 []              [list get watch create update patch delete]
+  replicasets             []                 []              [list get watch create update patch delete]
+  deployments.apps        []                 []              [list get watch create update patch delete]
+  pods.apps               []                 []              [list get watch create update patch delete]
+  replicasets.apps        []                 []              [list get watch create update patch delete]
+  deployments.extensions  []                 []              [list get watch create update patch delete]
+  pods.extensions         []                 []              [list get watch create update patch delete]
+  replicasets.extensions  []                 []              [list get watch create update patch delete]
+[root@test global1]# kubectl --context=global1-context run pod1 --image=httpd -n development
+pod/pod1 created
+[root@test global1]# kubectl get pods
+NAME                    READY   STATUS    RESTARTS     AGE
+app1-65d6849598-bvftp   1/1     Running   2 (8h ago)   2d1h
+app2-67777cf44f-7qctv   1/1     Running   2 (8h ago)   2d1h
+app2-67777cf44f-8wn4n   1/1     Running   2 (8h ago)   2d1h
+app2-67777cf44f-c2t7d   1/1     Running   2 (8h ago)   2d1h
+app2-67777cf44f-kkg67   1/1     Running   2 (8h ago)   2d1h
+d1-7cf89b6844-2x292     1/1     Running   2 (8h ago)   2d1h
+d1-7cf89b6844-5x826     1/1     Running   2 (8h ago)   2d1h
+d1-7cf89b6844-z9ns8     1/1     Running   2 (8h ago)   2d1h
+leno5                   1/1     Running   2 (8h ago)   2d1h
+leno6                   1/1     Running   2 (8h ago)   2d1h
+[root@test global1]# kubectl get pods -n development
+NAME   READY   STATUS    RESTARTS   AGE
+pod1   1/1     Running   0          37s
+[root@test global1]# kubectl config get context
+error: unknown command "get context"
+See 'kubectl config -h' for help and examples
+[root@test global1]# kubectl config get contexts
+error: unknown command "get contexts"
+See 'kubectl config -h' for help and examples
+[root@test global1]# kubectl config get-contexts
+CURRENT   NAME                          CLUSTER      AUTHINFO           NAMESPACE
+          global1-context               kubernetes   global1            development
+*         kubernetes-admin@kubernetes   kubernetes   kubernetes-admin
+[root@test global1]# kubectl --context=global1-context run pod2 --image=httpd -n development
+

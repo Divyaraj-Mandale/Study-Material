@@ -1,0 +1,232 @@
+---java install--------------------------------------------------------------
+
+sudo apt-get update
+sudo apt install openjdk-17-jre-headless -y
+java --version
+
+sudo apt-get remove openjdk-17-jre-headless -y
+
+---maven install--------------------------------------------------------------
+
+sudo apt update
+sudo apt-get install maven -y
+mvn --version
+
+sudo apt-get remove maven -y
+
+---docker install--------------------------------------------------------------
+
+sudo apt-get update
+sudo apt install docker.io -y
+sudo docker --version
+
+
+sudo apt-get remove docker docker-engine docker.io
+
+---mysql install--------------------------------------------------------------
+
+sudo apt update
+sudo apt install mysql-server -y
+sudo systemctl start mysql.service
+mysql --version
+
+----to connect the rds-----
+
+mysql -h raj-database.cygfjmsyrnaj.us-east-2.rds.amazonaws.com -P 3306 -u admin -p
+admin123
+
+
+-------------------------------------------------------------------------------------------
+
+2.connect runner
+
+goto :- Peoject > settings > CICD > runner >
+
+  install runner before that check the Architecture
+  command - dpkg --print-architecture 
+  and select ruuner according to architecture
+  go to ruuner copy command and paste into ec2 for connection
+  give the proper information like
+                                                   
+Enter the GitLab instance URL (for example, https://gitlab.com/):[https://gitlab.com/]:- hit enter
+Enter the registration token:[GR1348941bkm4m-mAhWAUZRfjzuJu]:- hit enter
+Enter a description for the runner:[ip-172-31-35-203]:- hit enter
+Enter tags for the runner (comma-separated):- give any tag name remember we have to give that name inside yml file (ec2,server)
+Enter optional maintenance note for the runner:- hit enter
+Enter an executor: docker+machine, kubernetes, instance, custom, shell, parallels, virtualbox, ssh, docker, docker-windows, docker-autoscaler:- shell
+
+
+goto runner >  click on edit option > and check run without tag --if you want to run withut tag
+
+-------------------------------------------------------------------------------------------
+
+3.Shell profile loading - move to root before doing that operation - sudo su
+
+To troubleshoot this error, check 
+command - compulsory do sudo su before running this command
+vi /home/gitlab-runner/.bash_logout
+For example, if the .bash_logout file has a script section like the following, 
+comment it out and restart the pipeline:
+
+before :-
+
+if [ "$SHLVL" = 1 ]; then
+    [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+fi
+
+after :-
+
+#if [ "$SHLVL" = 1 ]; then
+#  		[ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+#fi
+
+-------------------------------------------------------------------------------------------
+
+4.give the permission to docker.sock to perform the operation on docker
+
+command - 
+chmod 777 /var/run/docker.sock
+
+after stop and start server again give the permission
+
+-------------------------------------------------------------------------------------------
+
+5.set the login credential for docker in gitlab variable
+
+goto :- Peoject > settings > CICD > variable > add variable
+1. Add variable
+2. Description - any
+3. Key - variable name like ( user , pass)
+4. value - valuse of variable ( username, password - most use token dont use direct poassword)
+
+dont put the pass word as it is - goto docker hub generate token and put as a password
+goto - My Account > Security > New Access Token > Access Token Description (name or anything) 
+       > Access Permission ( Read, write, Delete) > Generate > copy and close
+
+-------------------------------------------------------------------------------------------
+
+6. (Dockerfile)
+
+FROM openjdk:17-alpine
+EXPOSE 8080
+ADD target/SpringBootHtmlAwsRds.jar helloworld
+ENTRYPOINT ["java", "-jar","helloworld"]
+
+-----------------------------------------------------------------------------------------------
+
+7. write the gitlab cicd pipeline
+use this default name - (.gitlab-ci.yml)
+
+(Notes - $user - username of dockerhub 
+		$pass - password of dockerhub)
+(dont use direct value of username or password instead of that use variablke which is declare in gtilab variable)
+
+stages:
+    - build_project
+    - build_image
+    - push_image
+    - deploy_image
+
+build_project:
+    stage: build_project
+    image:  maven:3.6.1-jdk-8-slim
+    script:
+        - echo "Building app..."
+        - mvn clean install
+        - echo "Finished building the app."
+    artifacts:
+        expire_in: 1 week
+        paths:
+            - target/SpringBootHtmlAwsRds.jar
+    tags:
+        - ec2
+        - server
+
+build_image:
+    stage: build_image
+    script:
+        - echo "building image"
+        - docker build . -t $user/springboothtmlawsrds:hello
+        - echo "Finished building image."
+    tags:
+        - ec2
+        - server
+
+push_image:
+    stage: push_image
+    script:
+        - echo "building con"
+        - docker login -u $user -p $pass
+        - docker push $user/springboothtmlawsrds:hello
+        - echo "Finished building con."
+    tags:
+        - ec2
+        - server
+
+deploy_image:
+    stage: deploy_image
+    script:
+        - echo "building con"
+        - docker run -it -d --name sachin -p 8080:8080 $user/springboothtmlawsrds:hello
+        - echo "Finished building con."
+    tags:
+        - ec2
+        - server
+------------------------------------------------------------------------------------------------
+
+8.to check the jar
+goto path in ec2 - cd /home/gitlab-runner/builds/{runner-code}/0/{username}/{projectname}/target/
+
+------------------------------------------------------------------------------------------------
+
+9. To check for containers in a running state and created images use the following command:
+
+for running - sudo docker ps
+for stapped - sudo docker ps -a
+for Images  - sudo docker images
+
+------------------------------------------------------------------------------------------------
+
+10. to check the op out the running docker images user below url
+
+ec2_public_port:docker_image_port/url_path
+
+
+
+
+
+
+
+
+
+
+================================================================================================
+------------------------------------------------------------------------------------------------
+
+sudo mysql
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';
+
+ALTER USER 'admin'@'testrds.c9e0m8c48d3b.us-east-1.rds.amazonaws.com' IDENTIFIED WITH mysql_native_password BY 'admin123';
+
+exit
+
+sudo systemctl start mysql
+sudo systemctl enable mysql
+sudo systemctl status mysql
+
+mysql -u root -p
+root
+
+----to connect the rds-----
+
+mysql -h testrds.c9e0m8c48d3b.us-east-1.rds.amazonaws.com -P 3306 -u admin -p
+admin123
+
+------------------------------------------
+
+mvn spring-boot:run
+
+cd springboothtmlawsrds/src/main/resources
+vi application.properties
+

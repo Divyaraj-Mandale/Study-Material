@@ -1,0 +1,27 @@
+git init
+git config --global user.name "divyaraj"
+git config --global user.email "divyaraj@gmail.com"
+git config list
+git add . or git add filename
+git status
+git commit -m "first commit"
+git log 
+git log oneline
+git remote add origin URL
+git push origin master
+git pull origin master
+git merge branch1
+git rebase master
+git stash 
+git stash list
+git stach apply stash[1]
+git stach clean
+git reset .
+git reset --hard
+git revert commitID
+git branch
+git branch branch1
+git checkout master
+git branch -D branch
+git squash [b,c,d]
+git clone URL

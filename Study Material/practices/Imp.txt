@@ -1,0 +1,63 @@
+AWS
+851725215893					sachin@1000
+sachinborde1000@gmail.com		sachin@1000
+
+Devops
+
+1. Linux
+2. Git
+3. Jenkins
+4. Docker
+5. Kubernate
+6. Teraform
+7. Ansible
+8. Prometheus
+9. Grafana
+10. AWS - EC2
+11. AWS - Elastic Beanstalk
+12. AWS - S3 Bucket
+12. AWS - Route 53
+13. AWS - RDS
+
+ubuntu@ip-172-31-80-162:~$ free
+ubuntu@ip-172-31-80-162:~$ free -g
+ubuntu@ip-172-31-80-162:~$ nproc
+ubuntu@ip-172-31-80-162:~$ df -h
+ubuntu@ip-172-31-80-162:~$ top
+
+1. clear the screen
+ubuntu@ip-172-31-80-162:~$ clear
+
+2. create any file
+ubuntu@ip-172-31-80-162:~$ touch first-shell-script.sh
+
+3. see list of files and folders
+ubuntu@ip-172-31-80-162:~$ ls
+
+4. see the current working directory
+ubuntu@ip-172-31-80-162:~$ pwd
+
+5. see the whole permission and info about file
+ubuntu@ip-172-31-80-162:~$ ls -ltr
+
+6. see description and use of command 
+ubuntu@ip-172-31-80-162:~$ man command-name
+
+7. create the folder
+ubuntu@ip-172-31-80-162:~$ mkdir folder-name
+
+8. delete the folder
+ubuntu@ip-172-31-80-162:~$ rm -r folder-name
+
+9. delete the file
+ubuntu@ip-172-31-80-162:~$ rm file-name
+
+10. delete the folder who contains files
+ubuntu@ip-172-31-80-162:~$ rm -rf folder-name
+
+11. write the content in file
+ubuntu@ip-172-31-80-162:~$ vi file-name
+
+12. if you want to grant access for everyone 
+ubuntu@ip-172-31-80-162:~$ chmod 777 file-name
+

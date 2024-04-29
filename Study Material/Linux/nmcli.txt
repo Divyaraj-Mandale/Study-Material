@@ -1,0 +1,137 @@
+tcp/ip:-
+*******
+->we have 2 types:
+1)ipv4
+2)ipv6
+
+
+ipv4:-
+*****
+-> it is 32 bit address
+-> it is divided into 4 octats.
+-> each octat will contain 8 bits
+-> there are 5 class
+-> the basic parts are :-
+network & host
+-> it is in decimal format
+-> it is having "." as the octat seperator.
+
+11111111.11111111.11111111.11111111
+
+ex: 192.168.142.140
+
+ipv6:-
+*****
+-> it is 128 bit addressing
+-> 128 bits are divided into 8 blocks
+-> each block will contain 16bits.
+-> there are no classes
+->there are 2 basic parts
+prefix & postfix
+-> it is in hexadecimal format
+-> it is having ":" as block seperator
+
+1111111111111111:1111111111111111:1111111111111111:1111111111111111:1111111111111111:1111111111111111:1111111111111111:1111111111111111
+
+
+classes of ipv4:-
+****************
+it has the network from 0-255 =256
+
+class A  --> 0-126
+class B --> 128-191
+class C --> 192-223
+class D --> 224-239
+class E --> 240-255
+
+127 -> loopback address.
+
+subnets:-
+********
+->the division one network in many network.
+-> we have 3 classes:
+class A
+class B 
+class C
+-> consider network(1) & host(0)
+-> the number of  network bits is called as "subnet mask"
+
+class A:-
+*********
+
+    N	    H	     H	     H				
+11111111.00000000.00000000.00000000   --> /8
+
+class B:-
+*********
+
+   N        N        H        H 
+11111111.11111111.00000000.00000000   ---> /16
+
+class C:-
+*********
+
+    N       N        N       H 
+11111111.11111111.11111111.00000000  ---> /24
+
+network management:-
+*******************
+-> the process of creation,editing & removing of network is called network management.
+-> the tools usedc for network managing are called network manager.
+network manager:
+****************
+-> it is a daemon responsible  for managing network interfaces.
+-> the command used for managing network are "nmcli" & "nmtui".
+-> a device used by network manager is NIC[network interface card].
+-> we can have multiple connections but only one connection should be active.
+-> the config file is present in /etc/sysconfig/network-scripts directory
+-> when ever we do the config file changes we have to restart the service of network manager.
+#systemctl restart NetworkManager
+
+nmcli[network manager command line interface] commands:-
+*******************************************************
+
+#nmcli device show ---> to list all available network devices.
+
+#nmcli connection show  -->to  list all available connections.
+
+#nmcli connection reload <connection name>   --> whenever u edit a connection connection reload is important.
+
+#nmcli con show --active --> to list a avtive connections
+
+#nmcli con down   <connection name>   ---> to stop the connection.
+
+#nmcli con up <connection name>    ---> to start the connection.
+
+#nmcli con add con-name "<connection name>" type "ethernet" ifname "<NIC device>"
+
+ex: #nmcli con add con-name "zafar" type "ethernet" ifname "ens33"
+
+#nmcli con add con-name "<connection name>" type "ethernet" ifname "<NIC device>" ipv4.addresses "172.25.250.10/24" ipv4.method  "manual"
+
+modifing a connection:-
+***********************
+#nmcli con mod "<connection name>"  ipv4.method "auto"
+
+note : auto --> DHCP is enabled  [bootproto=dhcp]
+       manual --> DHCP is disabled  [bootproto=no]
+
+#nmcli con mod "<connection name>" ipv4.addresses "192.168.160.1/24" ipv4.dns "192.168.1.2"
+
+deleting a connection using nmcli:-
+**********************************
+
+#nmcli con delete "<connection name>"
+ex: #nmcli con delete zafar
+
+
+nmtui[network managing text  user interface]:-
+*********************************************
+
+#nmtui   --> to open a window of nmtui
+
+edit a connection  --> to add a connection,to edit a connection settings, to remove a connection.
+activate a connection --> to activate a connection which is in active.
+set hostname --> to change the hostname of machine permanently.
+
+quit  --> to come back to shell or terminal.

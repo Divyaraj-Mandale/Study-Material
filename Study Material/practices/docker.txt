@@ -1,0 +1,86 @@
+1. Difference between an Image, Container, and Engine:
+Image: Think of it as a snapshot of a file system and the parameters needed to run a piece of software.
+Container: An instance of an image, including the application and all its dependencies, running in isolation.
+Engine: The core of Docker, facilitating the creation and management of containers.
+Understanding these distinctions sets the foundation for comprehending Docker's functionality.
+
+2. Docker command COPY vs ADD:
+While both commands serve the purpose of copying files, COPY is more straightforward and recommended for general file copying. On the other hand, ADD has additional capabilities, such as extracting tarballs and copying remote URLs.
+3. Docker command CMD vs RUN:
+In Docker, CMD is used to provide default arguments for the entry point, defining what will be run when the container starts. Conversely, RUN executes commands during the image build phase.
+4. Reducing Docker Image Size:
+Efficient image size is crucial. Strategies include using a minimal base image, combining RUN commands, cleaning up unnecessary files, and leveraging multi-stage builds to discard unneeded artifacts.
+5. Why and When to Use Docker:
+Docker offers a lightweight, portable, and consistent environment for applications. Its usage streamlines deployment processes, ensuring uniformity across diverse environments.
+6. Explaining Docker Components:
+
+Docker Compose: A tool for defining and running multi-container Docker applications.
+Docker File: A script with build instructions for a Docker image.
+Docker Image: A self-contained package with everything needed to run an application.
+Docker Container: An instantiated and runnable Docker image.
+
+7. Real Scenarios of Using Docker:
+Docker finds application in microservices architecture, CI/CD pipelines, and the isolation and packaging of applications and dependencies.
+8. Docker vs Hypervisor:
+Docker operates at the container level, sharing the host OS kernel and offering lightweight isolation. In contrast, hypervisors operate at the virtual machine level.
+9. Advantages and Disadvantages of Docker:
+
+Advantages: Portability, efficiency, rapid deployment, and optimized resource utilization.
+Disadvantages: Security concerns, learning curve, and potential complexity in larger deployments.
+
+10. Docker Namespace:
+A feature of the Linux kernel providing process isolation, ensuring processes in one namespace are oblivious to those in another.
+11. Docker Registry:
+A repository for Docker images, enabling distribution and sharing. Docker Hub is a popular public registry.
+12. Entry Point:
+An instruction in a Dockerfile defining the default command to execute when a container starts.
+13. Implementing CI/CD in Docker:
+CI/CD in Docker involves automating build, test, and deployment processes using tools like Jenkins, GitLab CI, or GitHub Actions.
+14. Data Persistence in Docker:
+Data on a container is lost by default when it exits. To persist data, use volumes or bind mounts.
+15. Docker Swarm:
+Docker Swarm is Docker's native clustering and orchestration solution for managing a group of Docker hosts.
+16. Common Docker Commands:
+
+View running containers: docker ps
+Run a container with a specific name: docker run --name container_name
+Export a Docker container: docker export container_id > filename.tar
+Import an existing Docker image: docker import filename.tar
+Delete a container: docker rm container_id
+Remove all stopped containers, unused networks, build caches, and dangling images: docker system prune
+
+17. Practices to Reduce Docker Image Size:
+
+Use a minimal base image.
+Consolidate commands in a single layer.
+Remove unnecessary dependencies and files.
+Leverage multi-stage builds.
+
+
+Certainly! Here's a list of common Docker interview questions:
+
+What is Docker?
+Explain the difference between Docker container and virtual machine (VM).
+How does Docker work?
+What are the main components of Docker architecture?
+What is a Docker image?
+How do you create a Docker image?
+What is a Dockerfile?
+Explain the purpose of Docker volumes.
+What is Docker Compose?
+How do you orchestrate containers in Docker?
+What is Docker Swarm? How does it differ from Kubernetes?
+Explain the concept of Docker networking.
+What is Docker Hub?
+How do you handle secrets in Docker?
+What is Docker registry?
+Explain the difference between ENTRYPOINT and CMD in a Dockerfile.
+What is the difference between COPY and ADD commands in Dockerfile?
+How do you scale Docker containers?
+Explain the concept of Docker logging.
+How do you monitor Docker containers?
+What are some best practices for Dockerfile and Docker image optimization?
+How do you troubleshoot Docker containers?
+What are the security considerations when using Docker?
+Explain the concept of Docker layer caching.
+How do you manage container lifecycle in Docker?

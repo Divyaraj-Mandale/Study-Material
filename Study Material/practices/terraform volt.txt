@@ -1,0 +1,67 @@
+root@ip-172-31-40-250:~# history
+   11  vault server -dev
+   12  export VAULT_ADDR='http://18.223.143.111:8200'
+   13  export VAULT_TOKEN="hvs.pcFZj5kkTktnn8txg2LNdBc8"
+   14  vault auth enable approle
+   15  vault policy write terraform - <<EOF
+path "*" {
+  capabilities = ["list", "read"]
+}
+
+path "secrets/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "kv/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+
+path "secret/data/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+path "auth/token/create" {
+capabilities = ["create", "read", "update", "list"]
+}
+EOF
+
+   16  vault write auth/approle/role/terraform     secret_id_ttl=10m     token_num_uses=10     token_ttl=20m     token_max_ttl=30m     secret_id_num_uses=40     token_policies=terraform
+   17  vault read auth/approle/role/terraform/role-id
+   18  vault write -f auth/approle/role/terraform/secret-id
+   19  history
+
+
+
+root@ip-172-31-9-12:~/raj# cat main.tf 
+provider "aws" {
+  region = "us-east-2"
+}
+
+provider "vault" {
+  address = "http://18.223.143.111:8200"
+  skip_child_token = true
+
+  auth_login {
+    path = "auth/approle/login"
+
+    parameters = {
+      role_id = "065ed4f7-bf7c-8270-71a2-2ee0087a46e6"
+      secret_id = "85646b36-3087-6bdf-92d6-a4560edea501"
+    }
+  }
+}
+
+data "vault_kv_secret_v2" "example" {
+  mount = "kv" 
+  name  = "test-secret"
+}
+
+resource "aws_instance" "my_instance" {
+  ami           = "ami-0b8b44ec9a8f90422"
+  instance_type = "t2.micro"
+
+  tags = {
+      Secret = data.vault_kv_secret_v2.example.data["username"]
+  }
+}

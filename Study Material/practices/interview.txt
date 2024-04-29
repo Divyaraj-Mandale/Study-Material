@@ -1,0 +1,49 @@
+
+1 Access other vpc from other nat gateway (VPC Peering and Transit Gateway)
+2 Rds proxy system (increasing efficiancy and When failovers occur, RDS Proxy routes requests directly to the new database instance.)
+3 How to create cluster group in aws. (by using server or serverless )
+4 Diff of cluster group between ec2 and fargate (server and serverless)
+5 Load balancer type (4)
+6 How many rules we define for ELB (3 listner, target, security)
+7 What is global acceslator of ELB (Improve application availability, performance, and security using the AWS global network)
+8 Taget of alb
+9 What is the difference between api gateway and application load balancer in aws
+10 What is the difference between ingress and cong in 
+11 How to provide the certificte in k8s (create a k8s secrets)
+12 what is use of search manager (kube-controller-manager)
+13 what the element we need to deploye an ngix service 
+14 how to expose port via ingress and  who will take care of that	(Ingress Controller Takes Care and DNS Configuration (Optional))
+15 service name to allocate ip (kube proxy)
+16 What is MetalLB (create IP pool and assign IP from the pool)
+17 How many node we can create in k8s (No more than 5,000 nodes. No more than 150,000 total pods. No more than 300,000 total containers.)
+18 Use of etcd
+19 Type of database etcd connect (it is distributed key-value store) 
+20 what are the docker rpository (Docker hub, ECR, GitLab Registry, Harbur)
+21 what is Harbor (Harbor is an open source registry like docker hub)
+22 Pipeline of jenkins to deply springboot application
+23 Tell the plugins (Build pipeline view, publish over SHH, sonarcube, kubernets, git, maven, Amazon EC2)
+24 how will you see what is machanism to rollback scenario.
+25 Blue Green Deployment statergies
+ 	a Recrete Deployment   (delete all pods at a time  and create new pods after that)
+	b Rolling updates Deployment (delete 1 v1 pod and create 1 v2 pods and do it like this )
+	c Blue Green Deployment -(older env in blue color which is running now and new env in green color we just created and tested this also running but traffic is going on blue env.
+	  once testing done we route the 100% taffic from blue env to green env. if any case application goes down we do rool back on blue env if not we depricate the blue env)
+	d canary Deployment (we route some % of traffic from v1 to v2 and we will test it once it success we will increase the % and in this why we will achive 100% v2)
+26 Type of elastic block storages
+28 like s3 what are type of storage in aws (EBS, EFS)
+29 where we keep our master node in aws of eks (in aws infrastucture and take care by kubeadm)
+30 basic pods are eks give us or how many basic pods eks gives us by defoult
+31 where does it sits (in case of ec2 on worker node  and in case of forgate it will launch in it)
+32 where does pods launched
+33 What is pv and pvc
+34 can we  create 1 pv and multiple pvcs
+35 if we create pv an pvc where does thoes pv created (e.g. EFS,  AWS EBS volumes, Azure Disk, NFS server, etc.)
+36 if worker node go down how we manage
+37 can 1 ebs allocated to multile storages
+38 if you attache pv to an pod will it be what are currecnt that will usig for pvc? (notunderstud)
+39 where are storing our artifact? (docker hub , ECR, Git lab registry, Nexus)
+40 sonarqube? (code qualaity managment tool)
+41 what is Nexus?  (Nexus acts as a repository manager for storing various types of artifacts, including JAR files, WAR files, Docker images, npm packages, Maven artifacts, and more. )
+42 how do we recover artifat in case of failure (use tool like Nexus who keep the backup so easy to retrieve)
+43 what is artifact? and use of artifact? (an artifact refers to any tangible output or result of the software development process.
+	 Artifacts play various roles throughout the software development lifecycle and are essential for building, testing, deploying, and maintaining software applications. )

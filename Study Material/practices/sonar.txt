@@ -1,0 +1,29 @@
+root@ip-172-31-2-240:/opt/sonarqube-9.9.4.87374# history
+    1  apt update
+   
+    3  
+    4  apt install openjdk-17-jre-headless
+	java --version
+    5  cd /opt  
+   11  apt update
+   12  wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.9.4.87374.zip
+	ls
+   15  apt install unzip
+   16  unzip sonarqube-9.9.4.87374.zip 
+   17  ls
+   18  ll
+   19  cd sonarqube-9.9.4.87374
+   20  ls
+   21  cd conf/
+   22  ls
+   23  cat sonar.properties 
+   24  cd ..
+   25  ls
+   26  cd bin/
+   27  ls
+   28  cd linux-x86-64/
+   29  ls
+   30  useradd sonaradmin
+   31  chown -R sonaradmin:sonaradmin /opt/sonarqube-9.9.4.87374
+   32  ll
+   33  su - sonaradmin

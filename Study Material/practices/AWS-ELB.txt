@@ -1,0 +1,20 @@
+AWS Interview Question
+
+ELB
+
+1. What is LB
+2. Types of LB  -(4)
+3. Define each LB
+4. What is listener (according to port it divert the request)
+5. Target group (group of instance)
+6. What is Target (single instance on which we want to route the trafic)
+7. Types of Target 
+   - IP based   10.0.0.0/8
+		100.64.0.0/10
+		172.16.0.0/12
+		192.168.0.0/16
+   - Lambda based
+   - instance based
+8. What is cress zone load balancer?
+	-load destribute as per no. of instance not as per AZ
+9. How many rules we can define in ALB? (By defult 1 for listener)

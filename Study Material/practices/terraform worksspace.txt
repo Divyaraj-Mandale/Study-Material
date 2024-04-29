@@ -1,0 +1,77 @@
+## to see it use tree command
+-> tree
+
+## to create new workspace
+-> terraform workspace new dev
+
+##to change workspace to dev
+-> terraform workspace select dev
+
+##to see the current position
+-> terraform workspace show
+
+
+root@ip-172-31-9-12:~/sachin# tree
+.
+├── main.tf
+├── modules
+│   └── ec2_instance
+│       └── main.tf
+└── terraform.tfstate.d
+    ├── dev
+    │   ├── terraform.tfstate
+    │   └── terraform.tfstate.backup
+    ├── prod
+    │   ├── terraform.tfstate
+    │   └── terraform.tfstate.backup
+    └── stage
+        ├── terraform.tfstate
+        └── terraform.tfstate.backup
+
+6 directories, 8 files
+root@ip-172-31-9-12:~/sachin# ls
+main.tf  modules  terraform.tfstate.d
+root@ip-172-31-9-12:~/sachin# 
+root@ip-172-31-9-12:~/sachin# cat modules/ec2_instance/main.tf 
+provider "aws" {
+    region = "us-east-2"
+}
+
+variable "ami" {
+  description = "This is AMI for the instance"
+}
+
+variable "instance_type" {
+  description = "This is the instance type, for example: t2.micro"
+}
+
+resource "aws_instance" "example" {
+    ami = var.ami
+    instance_type = var.instance_type
+}
+root@ip-172-31-9-12:~/sachin# cat main.tf 
+provider "aws" {
+  region = "us-east-2"
+}
+
+variable "ami" {
+  description = "new ami"
+ default = "ami-0b8b44ec9a8f90422"
+}
+
+variable "instance_type" {
+  description = "value"
+  type = map(string)
+
+  default = {
+    "dev" = "t2.micro"
+    "stage" = "t2.medium"
+    "prod" = "t2.xlarge"
+  }
+}
+
+module "ec2_instance" {
+  source = "./modules/ec2_instance"
+  ami = var.ami
+  instance_type = lookup(var.instance_type, terraform.workspace, "t2.micro")
+}
